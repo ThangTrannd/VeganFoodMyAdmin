@@ -22,6 +22,7 @@ export async function createPaymentDetail(orderId: number, provider: String, sta
         await connection.query(`commit`)
         return result.rows[0].id
     } catch (e) {
+        console.log(e)
         await connection.query(`rollback`)
         throw createException("Cant create order detail")
     }

@@ -25,6 +25,7 @@ async function createPaymentDetail(orderId, provider, status, phoneNumber, addre
         return result.rows[0].id;
     }
     catch (e) {
+        console.log(e);
         await connection.query(`rollback`);
         throw (0, index_1.createException)("Cant create order detail");
     }

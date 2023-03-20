@@ -25,23 +25,26 @@ async function addItemToCart(userId, sessionId, productId, quantity, size, note)
                 await (0, ShoppingSession_1.triggerUpdateSessionTotal)(userId, sessionId).then();
                 return (0, index_1.createResult)(true);
             }
-            await connection.query(`begin`);
-            let insertResult = await connection.query(`insert into "CartItem" (id, sessionid, productid, quantity, size, note)
+            else {
+                await connection.query(`begin`);
+                const product = await connection.query(`select displayimage from "Product" where id = ${productId}`);
+                let insertResult = await connection.query(`insert into "CartItem" (id, sessionid, productid, quantity,displayimage, size, note)
                                                        values (default,
                                                                ${sessionId},
                                                                ${productId},
                                                                ${quantity},
+                                                                '${product.rows[0].displayimage}',
                                                                '${size}',
                                                                '${note}')
             `);
-            await connection.query(`commit`);
-            console.log(insertResult);
-            if (insertResult.rowCount == 1) {
-                await (0, ShoppingSession_1.triggerUpdateSessionTotal)(userId, sessionId).then();
-                return (0, index_1.createResult)(true);
-            }
-            else {
-                return (0, index_1.createException)("Them san pham bi loi");
+                await connection.query(`commit`);
+                if (insertResult.rowCount == 1) {
+                    await (0, ShoppingSession_1.triggerUpdateSessionTotal)(userId, sessionId).then();
+                    return (0, index_1.createResult)(true);
+                }
+                else {
+                    return (0, index_1.createException)("Them san pham bi loi");
+                }
             }
         }
     }

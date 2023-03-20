@@ -44,6 +44,7 @@ Object.defineProperty(exports, "getLovedItems", { enumerable: true, get: functio
 const Statistical_1 = require("./Statistical");
 Object.defineProperty(exports, "getAllStatistical", { enumerable: true, get: function () { return Statistical_1.getAllStatistical; } });
 function createException(e) {
+    console.log(e);
     return {
         isSuccess: false,
         errorMessage: "Lỗi server: " + e,

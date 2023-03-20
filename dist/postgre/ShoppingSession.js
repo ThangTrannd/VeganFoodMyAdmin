@@ -118,9 +118,8 @@ async function deleteShoppingSession(userId, sessionId) {
     try {
         await connection.query(`begin`);
         const result = await connection.query(`delete
-                                               from "ShoppingSession"
-                                               where id = ${sessionId}
-                                                 and userid = ${userId}`);
+                                               from "CartItem"
+                                               where sessionid = ${sessionId}`);
         await connection.query(`commit`);
         if (result.rowCount === 1) {
             return (0, index_1.createResult)(true);

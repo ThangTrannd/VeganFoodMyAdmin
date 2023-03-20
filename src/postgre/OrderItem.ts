@@ -24,10 +24,10 @@ export async function addCartItemsToOrder(orderId: number, sessionId: number, us
         for (const item of sessionResult.rows) {
             await connection.query(`insert into "OrderItem" (id, orderid, productid, quantity, createat,
                                                              modifiedat, size, pricebeforediscount,
-                                                             priceafterdiscount, note)
+                                                             priceafterdiscount, note,oderid)
                                     values (default, ${orderId}, ${item.productId}, ${item.quantity}, now(),
                                             now(), '${item.size}', ${item.priceBeforeDiscount},
-                                            ${item.priceAfterDiscount}, '${item.note}')`)
+                                            ${item.priceAfterDiscount}, '${item.note}', ${orderId})`)
         }
         await connection.query(`commit`)
         await updateOrderDetailTotal(orderId, userId)

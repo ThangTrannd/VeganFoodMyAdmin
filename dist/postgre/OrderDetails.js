@@ -18,10 +18,10 @@ async function confirmOrder(userId, sessionId, provider, phoneNumber, address, n
         if (!_isSessionExist.isSuccess) {
             return (0, index_1.createException)("Gio hang khong ton tai!");
         }
-        let userCurrentOrder = await getUserCurrentOrder(userId);
-        if (userCurrentOrder.result != null) {
-            return (0, index_1.createException)("Bạn có đơn hàng chưa hoàn thành nên chưa thể tiếp tục đặt đơn");
-        }
+        // let userCurrentOrder = await getUserCurrentOrder(userId)
+        // if (userCurrentOrder.result != null) {
+        //     return createException("Bạn có đơn hàng chưa hoàn thành nên chưa thể tiếp tục đặt đơn")
+        // }
         console.log("Enter create order");
         let orderId = await createOrder(userId, sessionId, provider, phoneNumber, address, note);
         console.log("End create order");
@@ -62,8 +62,9 @@ exports.updateProductInventory = updateProductInventory;
 async function createOrder(userId, sessionId, provider, phoneNumber, address, note) {
     try {
         const connection = await new pg_1.Pool(posgre_1.PostgreSQLConfig);
-        let orderId = await createEmptyOrder(userId);
-        let paymentId = await (0, PaymentDetails_1.createPaymentDetail)(orderId, provider, "Đợi xác nhận", phoneNumber, address, note);
+        const orderId = await createEmptyOrder(userId);
+        console.log("Order id: " + orderId);
+        const paymentId = await (0, PaymentDetails_1.createPaymentDetail)(orderId, provider, "Đợi xác nhận", phoneNumber, address, note);
         await updatePaymentId(orderId, paymentId);
         await (0, OrderItem_1.addCartItemsToOrder)(orderId, sessionId, userId);
         return orderId;
@@ -284,7 +285,7 @@ async function createEmptyOrder(userId) {
     try {
         await connection.query(`begin`);
         let result = await connection.query(`insert into "OrderDetail" (id, userid, total, paymentid, createat, modifiedat)
-                                             values (default, ${userId}, 0, null, now(), now())
+                                             values (default, ${userId}, 0, 0, now(), now())
                                              returning id`);
         await connection.query(`commit`);
         return result.rows[0].id;
@@ -298,10 +299,10 @@ async function createEmptyOrder(userId) {
 exports.createEmptyOrder = createEmptyOrder;
 async function getOrders(type) {
     try {
-        if (type == null)
-            type = "%%";
         const connection = await new pg_1.Pool(posgre_1.PostgreSQLConfig);
-        let orders = await connection.query(`select "OrderItem".orderid        as "orderId",
+        let orders;
+        if (type == null) {
+            orders = await connection.query(`select "OrderItem".orderid        as "orderId",
                                                     PD.id                      as "paymentId",
                                                     U.name                     as "username",
                                                     U.id                       as "userId",
@@ -326,6 +327,37 @@ async function getOrders(type) {
                                                                                     inner join "PaymentDetails" PD on PD.id = "OrderDetail".paymentid
                                                                                     inner join "OrderItem" on "OrderDetail".id = "OrderItem".orderid)
                                              order by PD.modifiedat desc `);
+        }
+        else {
+            console.log(type);
+            orders = await connection.query(`select "OrderItem".orderid        as "orderId",
+                                                    PD.id                      as "paymentId",
+                                                    U.name                     as "username",
+                                                    U.id                       as "userId",
+                                                    PD.phonenumber             as "phoneNumber",
+                                                    status                     as "status",
+                                                    P.name                     as "productName",
+                                                    round(pricebeforediscount) as "priceBeforeDiscount",
+                                                    round(priceafterdiscount)  as "priceAfterDiscount",
+                                                    "OrderItem".quantity       as "quantity",
+                                                    PD.address                 as "address",
+                                                    PD.modifiedat              as "time",
+                                                    "OrderItem".note           as "note",
+                                                    provider                   as "provider"
+                                             from "OrderItem"
+                                                      inner join "Product" P on P.id = "OrderItem".productid
+                                                      inner join "ProductCategory" on P.categoryid = "ProductCategory".id
+                                                      inner join "OrderDetail" on "OrderItem".orderid = "OrderDetail".id
+                                                      inner join "User" U on U.id = "OrderDetail".userid
+                                                      inner join "PaymentDetails" PD on PD.id = "OrderDetail".paymentid
+                                             where "OrderItem".orderid in (select "OrderDetail".id
+                                                                           from "OrderDetail"
+                                                                                    inner join "PaymentDetails" PD on PD.id = "OrderDetail".paymentid
+                                                                                    inner join "OrderItem" on "OrderDetail".id = "OrderItem".orderid
+                                                                                    where PD.status = '${type}')
+                                             order by PD.modifiedat desc `);
+        }
+        console.log(orders);
         const numberFormatter = Intl.NumberFormat('vi-VN', { style: "currency", currency: "VND" });
         const map = new Map();
         for (let element of orders.rows) {
@@ -400,7 +432,7 @@ exports.getOrders = getOrders;
 async function getUserCurrentOrder(userId) {
     try {
         const connection = await new pg_1.Pool(posgre_1.PostgreSQLConfig);
-        let result = await connection.query(`select orderidid     as "orderId",
+        let result = await connection.query(`select orderid     as "orderId",
                                                     round(total)  as "total",
                                                     paymentid     as "paymentId",
                                                     PD.createat   as "createAt",
@@ -472,7 +504,7 @@ async function userCancelOrder(userId, orderId) {
                                              set status     = 'Bị hủy',
                                                  modifiedat = now()
                                              where id = ${paymentId}
-                                               and orderidid = ${orderId}
+                                               and orderid = ${orderId}
                                                and status like 'Đợi xác nhận'`);
         await connection.query(`commit`);
         if (result.rowCount != 1) {

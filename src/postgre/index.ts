@@ -55,6 +55,7 @@ export {
 }
 
 export function createException(e: any): APIResponse<any> {
+    console.log(e)
     return {
         isSuccess: false,
         errorMessage: "Lỗi server: " + e,
