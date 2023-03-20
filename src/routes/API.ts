@@ -490,13 +490,18 @@ export function API(app: Application) {
             res.json(createException(e));
         })
     })
-    app.post("/api/fav/add", (req: Request, res: Response) => {
+    app.post("/api/fav/add", async (req: Request, res: Response) => {
         const {token, productId} = req.body
         if (!validateToken(token)) {
             res.json(returnInvalidToken())
             return
         }
         const userId = (jwt.verify(token, process.env.JWT_SECRET!) as JWTPayload).id
+        const checkFav = await isUserLovedProduct(userId, productId)
+        if(checkFav.result){
+            console.log(checkFav)
+            res.status(400);
+        }
         addLovedItem(userId, productId).then(r => {
             res.json(r)
         }).catch(e => {

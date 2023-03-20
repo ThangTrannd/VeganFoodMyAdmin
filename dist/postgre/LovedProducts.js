@@ -25,7 +25,7 @@ async function getLovedItems(userId) {
                                              where useid = ${userId}
         ;`);
         result.rows.map(item => {
-            item.size = item.size.split(",").filter((it) => it !== "").join(",");
+            item.size = item.size.split(",").filter((it) => it != "").join(",");
         });
         return (0, index_1.createResult)(result.rows);
     }
@@ -62,7 +62,7 @@ async function deleteLovedItem(userId, productId) {
         }
         let result = await connection.query(`delete
                                              from "LovedItems"
-                                             where userid = ${userId}
+                                             where useid = ${userId}
                                                and productid = ${productId}`);
         await connection.query(`commit`);
         if (result.rowCount == 0) {
@@ -83,7 +83,7 @@ async function isItemAlreadyInList(userId, productId) {
         const connection = await new pg_1.Pool(posgre_1.PostgreSQLConfig);
         const result = await connection.query(`select *
                                                from "LovedItems"
-                                               where userid = ${userId}
+                                               where useid = ${userId}
                                                  and productid = ${productId}`);
         return result.rows.length == 1;
     }
@@ -96,7 +96,7 @@ async function isUserLovedProduct(userId, productId) {
         const connection = await new pg_1.Pool(posgre_1.PostgreSQLConfig);
         let result = await connection.query(`select *
                                              from "LovedItems"
-                                             where userid = ${userId}
+                                             where useid = ${userId}
                                                and productid = ${productId}`);
         return (0, index_1.createResult)(result.rowCount != 0);
     }

@@ -124,16 +124,7 @@ exports.getUsers = getUsers;
 async function getUser(token) {
     const user = await jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
     const connection = await new pg_1.Pool(posgre_1.PostgreSQLConfig);
-    let result = await connection.query(`select "User".id,
-                                                "User".username,
-                                                "User".name,
-                                                "User".email,
-                                                "User".phoneNumber,
-                                                "User".createAt,
-                                                "UserAddress".address
-                                         from "User"
-                                                  inner join "UserAddress" on "User".id = "UserAddress".userId
-                                         where "User".id = ${user.id};`);
+    let result = await connection.query(`select "User".id,"User".username,"User".name,"User".email,"User".phoneNumber,"User".createAt,"UserAddress".address from "User" left join "UserAddress" on "User".id::text = "UserAddress".userId where "User".id = ${user.id};`);
     if (result.rows.length == 0) {
         return {
             isSuccess: false,

@@ -459,13 +459,18 @@ function API(app) {
             res.json((0, postgre_1.createException)(e));
         });
     });
-    app.post("/api/fav/add", (req, res) => {
+    app.post("/api/fav/add", async (req, res) => {
         const { token, productId } = req.body;
         if (!validateToken(token)) {
             res.json(returnInvalidToken());
             return;
         }
         const userId = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET).id;
+        const checkFav = await (0, LovedProducts_1.isUserLovedProduct)(userId, productId);
+        if (checkFav.result) {
+            console.log(checkFav);
+            res.status(400);
+        }
         (0, LovedProducts_1.addLovedItem)(userId, productId).then(r => {
             res.json(r);
         }).catch(e => {

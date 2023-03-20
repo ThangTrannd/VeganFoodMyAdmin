@@ -58,7 +58,7 @@ export async function deleteLovedItem(userId: number, productId: number): Promis
         }
         let result = await connection.query(`delete
                                              from "LovedItems"
-                                             where userid = ${userId}
+                                             where useid = ${userId}
                                                and productid = ${productId}`)
         await connection.query(`commit`)
         if (result.rowCount == 0) {
@@ -77,7 +77,7 @@ async function isItemAlreadyInList(userId: number, productId: number): Promise<b
         const connection = await new Pool(PostgreSQLConfig)
         const result = await connection.query(`select *
                                                from "LovedItems"
-                                               where userid = ${userId}
+                                               where useid = ${userId}
                                                  and productid = ${productId}`)
         return result.rows.length == 1
     } catch (e) {
@@ -91,7 +91,7 @@ export async function isUserLovedProduct(userId: number, productId: number): Pro
         const connection = await new Pool(PostgreSQLConfig)
         let result = await connection.query(`select *
                                              from "LovedItems"
-                                             where userid = ${userId}
+                                             where useid = ${userId}
                                                and productid = ${productId}`)
         return createResult(result.rowCount != 0)
     } catch (e) {
