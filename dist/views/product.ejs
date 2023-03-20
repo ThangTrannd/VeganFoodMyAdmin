@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <title>VeganFood Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet"/>
+    <link href="/css/styles.css" rel="stylesheet"/>
+    <style>
+        td {
+            text-align: center;
+            vertical-align: middle;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        th {
+            text-align: center;
+            vertical-align: center;
+        }
+
+        tr {
+            text-align: center;
+            vertical-align: center;
+        }
+
+        .product-name {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+    </style>
+    <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
+</head>
+<body class="sb-nav-fixed">
+<%- include ('topnav.ejs') %>
+<div id="layoutSidenav">
+    <%- include ('sidenav.ejs') %>
+    <div id="layoutSidenav_content">
+        <main class="container-fluid px-4">
+            <h1 class="mt-4">Các sản phẩm</h1>
+            <div class="top-buttons mt-3"
+                 style="display: flex; flex-direction: row; align-content: baseline; justify-content: space-between; gap: 10%">
+                <div class="input-group mb-3 rounded-3" style="gap: 0; max-width: 40%; visibility: hidden">
+                    <span class="input-group-text"><i
+                                class="fa-solid fa-magnifying-glass"></i></span>
+                    <input type="text" class="form-control" style="display: none; visibility: hidden"
+                           placeholder="Tìm kiếm" aria-label="...">
+                    <span class="input-group-text"><i
+                                class="fa-solid fa-sliders"></i></span>
+                </div>
+                <div class="input-group mb-3 align-content-end justify-content-end" style="max-width: 25%">
+                    <button data-bs-toggle="modal" data-bs-target="#addProductModal"
+                            class="btn-primary p-2 rounded-3" style="background-color: #FFA500; border-color: #FFA500">
+                        Thêm sản phẩm
+                    </button>
+                </div>
+                <!-- Modal -->
+                <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl"
+                         style="text-align: start">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Thêm sản phẩm mới</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form method="post" enctype="multipart/form-data" action="/add_product"
+                                      id="addProductForm">
+                                    <label for="name" class="form-label">Tên</label>
+                                    <div class="input-group mb-3">
+                                        <input aria-label="..." type="text" class="form-control" id="basic-url"
+                                               aria-describedby="basic-addon3" name="name" required>
+                                    </div>
+                                    <label for="name" class="form-label">Mô tả</label>
+                                    <div class="input-group mb-3">
+                                        <input aria-label="..." type="text" class="form-control" id="basic-url"
+                                               aria-describedby="basic-addon3" name="description" required>
+                                    </div>
+                                    <div class="input-group mb-3" style="display: flex; flex-direction: row">
+                                        <div class="input-group-prepend" style="flex: 2">
+                                            <label class="input-group-text" for="inputGroupSelect01">Loại sản
+                                                phẩm</label>
+                                        </div>
+                                        <select class="custom-select" id="inputGroupSelect01" style="flex: 12"
+                                                name="productCategory" required>
+                                            <option value="">Chọn ...</option>
+                                            <% for (var i = 0; i < productCategories.length; i++) { %>
+                                                <option value="<%= productCategories[i].id %>"><%= productCategories[i].name %></option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                    <label for="quantity" class="form-label">Số luợng</label>
+                                    <div class="input-group mb-3">
+                                        <input aria-label="..." type="number" class="form-control" id="basic-url"
+                                               aria-describedby="basic-addon3" name="quantity" required min="0">
+                                    </div>
+                                    <label for="price" class="form-label">Giá</label>
+                                    <div class="input-group mb-3">
+                                        <input aria-label="..." type="number" class="form-control" id="basic-url"
+                                               aria-describedby="basic-addon3" name="price" required>
+                                    </div>
+                                    <div class="input-group mb-3" style="display: flex; flex-direction: row">
+                                        <div class="input-group-prepend" style="flex: 2">
+                                            <label class="input-group-text" for="inputGroupSelect01">Mã giảm giá</label>
+                                        </div>
+                                        <select class="custom-select" id="inputGroupSelect01" name="discount"
+                                                style="flex: 12">
+                                            <option value="">Chọn ...</option>
+                                            <% for (var i = 0; i < discounts.length; i++) { %>
+                                                <option value="<%= discounts[i].id %>"><%= discounts[i].name %></option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                    <div class="input-group mb-3" style="display: flex; flex-direction: column">
+                                        <label for="quantity" class="form-label">Size</label>
+                                        <div class="btn-group" role="group"
+                                             aria-label="Basic checkbox toggle button group">
+                                            <input type="checkbox" class="btn-check" id="btncheck1" autocomplete="off"
+                                                   value="S" name="sizeS">
+                                            <label class="btn btn-outline-primary" for="btncheck1">S</label>
+
+                                            <input type="checkbox" class="btn-check" id="btncheck2" autocomplete="off"
+                                                   name="sizeM"
+                                                   value="M">
+                                            <label class="btn btn-outline-primary" for="btncheck2">M</label>
+
+                                            <input type="checkbox" class="btn-check" id="btncheck3" autocomplete="off"
+                                                   name="sizeL"
+                                                   value="L">
+                                            <label class="btn btn-outline-primary" for="btncheck3">L</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="formFile" class="form-label">Ảnh</label>
+                                        <input class="form-control" type="file" name="image" accept="image/*"
+                                               id="formFile" required>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Huỷ</button>
+                                <button type="submit" class="btn btn-primary" form="addProductForm"
+                                        style="border-color: #FFA500; background-color: #FFA500">Thêm mới
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Main view -->
+            <div>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Ảnh</th>
+                        <th scope="col">Tên</th>
+                        <th scope="col">Mô tả</th>
+                        <th scope="col">Loại sản phẩm</th>
+                        <th scope="col">Số luợng</th>
+                        <th scope="col">Giá</th>
+                        <th scope="row">Chuơng trình giảm giá</th>
+                        <th scope="row">Size</th>
+                        <th scope="row">Hoạt động</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <% for (var i = 0; i < products.length; i++) { %>
+                        <tr>
+                            <td><%= products[i].id %></td>
+
+                            <td>
+                                <img style="width: 128px; height: 128px; object-fit: contain"
+                                     src="<%= products[i].displayImage %>"
+                                     alt="...">
+                            </td>
+                            <td>
+                                <%= products[i].productName %>
+                            </td>
+                            <td>
+                                <p style="text-overflow: ellipsis"><%= products[i].productDescription %></p>
+                            </td>
+                            <td>
+                                <%= products[i].productCategoryName %>
+                            </td>
+                            <td>
+                                <%= products[i].quantity %>
+                            </td>
+                            <td>
+                                <%= products[i].price %>
+                            </td>
+                            <td>
+                                <%= products[i].discount %>
+                            </td>
+                            <td>
+                                <%= products[i].size %>
+                            </td>
+                            <td>
+                                <!-- Detail Modal -->
+                                <div class="modal fade " id="<%= "detailModal" + products[i].id %>" tabindex="-1"
+                                     aria-labelledby="detailModal" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-scrollable modal-xl modal-dialog-centered"
+                                         style="text-align: start">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLabel">Chi tiết</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body"
+                                                 style="display: flex; flex-direction: column; gap: 16px">
+                                                <span><strong>Tên: </strong><%= products[i].productName %></span>
+                                                <span><strong>Mô tả: </strong><%= products[i].productDescription %></span>
+                                                <span><strong>Loại sản phẩm: </strong><%= products[i].productCategoryName %></span>
+                                                <span><strong>Số luợng: </strong><%= products[i].quantity %></span>
+                                                <span><strong>Giá: </strong><%= products[i].price %></span>
+                                                <span><strong>Chuơng trình giảm giá: </strong><%= products[i].discount %></span>
+                                                <span><strong>Size: </strong><%= products[i].size %></span>
+
+                                                <span style="display: flex; flex-direction: row;align-content: center; justify-content: center"><strong
+                                                            style="text-align: center">Ảnh</strong></span>
+                                                <span><img src="<%= products[i].displayImage %>"
+                                                           style="width: 1080px; height: 1920px; object-fit: contain"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Delete Modal -->
+                                <div class="modal fade " id="<%= "deleteModal" + products[i].id %>" tabindex="-1"
+                                     aria-labelledby="detailModal" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-scrollable modal-xl modal-dialog-centered"
+                                         style="text-align: start">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLabel">Xóa</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Xác nhận xoá <%= products[i].productName %></p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <form name="<%= "deleteProduct" + products[i].id %>"
+                                                      enctype="application/x-www-form-urlencoded"
+                                                      id="<%= "deleteProduct" + products[i].id %>"
+                                                      method="post"
+                                                      action="/delete_product">
+                                                    <input type="text" style="display: none" name="id"
+                                                           aria-label="..."
+                                                           value="<%= products[i].id %>">
+                                                </form>
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                    Huỷ
+                                                </button>
+                                                <button type="submit" class="btn btn-primary"
+                                                        form="<%= "deleteProduct" + products[i].id %>"
+                                                        style="background-color: #FFA500; border-color: #FFA500"
+                                                >Xoá
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Update Modal -->
+                                <div class="modal fade" id="<%= "updateModal" + products[i].id %>" tabindex="-1"
+                                     aria-labelledby="exampleModalLabel"
+                                     aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl"
+                                         style="text-align: start">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLabel">Chỉnh sửa sản phẩm</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form method="post" action="/update_product"
+                                                      enctype="multipart/form-data"
+                                                      id="<%= "updateProductForm" + products[i].id %>">
+                                                    <input aria-label="..." name="oldId" value="<%= products[i].id %>"
+                                                           style="display: none">
+                                                    <label for="name" class="form-label">Tên</label>
+                                                    <div class="input-group mb-3">
+                                                        <input aria-label="..." type="text" class="form-control"
+                                                               id="product-name-update"
+                                                               value="<%= products[i].productName %>"
+                                                               aria-describedby="basic-addon3" name="name" required>
+                                                    </div>
+                                                    <label for="name" class="form-label">Mô tả</label>
+                                                    <div class="input-group mb-3">
+                                                        <input aria-label="..." type="text" class="form-control"
+                                                               id="product-description-update"
+                                                               value="<%= products[i].productDescription %>"
+                                                               aria-describedby="basic-addon3" name="description"
+                                                               required>
+                                                    </div>
+                                                    <div class="input-group mb-3"
+                                                         style="display: flex; flex-direction: row">
+                                                        <div class="input-group-prepend" style="flex: 2">
+                                                            <label class="input-group-text"
+                                                                   for="inputGroupSelect01-update">Loại
+                                                                sản
+                                                                phẩm</label>
+                                                        </div>
+                                                        <select class="custom-select" id="inputGroupSelect01-update"
+                                                                style="flex: 12"
+                                                                name="productCategory" required>
+                                                            <option value="">Chọn ...</option>
+                                                            <% for (var k = 0; k < productCategories.length; k++) { %>
+                                                                <option value="<%= productCategories[k].id %>"><%= productCategories[k].name %></option>
+                                                            <% } %>
+                                                        </select>
+                                                    </div>
+                                                    <label for="quantity" class="form-label">Số luợng</label>
+                                                    <div class="input-group mb-3">
+                                                        <input aria-label="..." type="number" class="form-control"
+                                                               id="quantity-update"
+                                                               value="<%= products[i].quantity %>"
+                                                               aria-describedby="basic-addon3" name="quantity" required
+                                                               min="0">
+                                                    </div>
+                                                    <label for="price" class="form-label">Giá</label>
+                                                    <div class="input-group mb-3">
+                                                        <input aria-label="..." type="number" class="form-control"
+                                                               id="price-update"
+                                                               value="<%= products[i].price %>"
+                                                               aria-describedby="basic-addon3" name="price" required>
+                                                    </div>
+                                                    <div class="input-group mb-3"
+                                                         style="display: flex; flex-direction: column">
+                                                        <label for="quantity" class="form-label">Size</label>
+                                                        <div class="btn-group" role="group"
+                                                             aria-label="Basic checkbox toggle button group">
+                                                            <input type="checkbox"
+                                                                   class="btn-check"
+                                                                   id="<%= "btncheckSby" + products[i].id %>"
+                                                                   autocomplete="off"
+                                                                   value="S" name="sizeS">
+                                                            <label class="btn btn-outline-primary"
+                                                                   for="<%= "btncheckSby" + products[i].id %>">S</label>
+
+                                                            <input type="checkbox"
+                                                                   class="btn-check"
+                                                                   id="<%= "btncheckMby" + products[i].id %>"
+                                                                   autocomplete="off"
+                                                                   name="sizeM"
+                                                                   value="M">
+                                                            <label class="btn btn-outline-primary"
+                                                                   for="<%= "btncheckMby" + products[i].id %>">M</label>
+
+                                                            <input type="checkbox"
+                                                                   class="btn-check"
+                                                                   id="<%= "btncheckLby" + products[i].id %>"
+                                                                   autocomplete="off"
+                                                                   name="sizeL"
+                                                                   value="L">
+                                                            <label class="btn btn-outline-primary"
+                                                                   for="<%= "btncheckLby" + products[i].id %>">L</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="formFile" class="form-label">Ảnh (bỏ trống nếu giữ
+                                                            nguyên ảnh cũ)</label>
+                                                        <input class="form-control" type="file" name="image"
+                                                               accept="image/*"
+                                                               id="formFile">
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                    Huỷ
+                                                </button>
+                                                <button type="button" class="btn btn-primary"
+                                                        onclick="((event)=> {
+                                                                let nameInput = document.getElementById(`product-name-update`)
+                                                                if (nameInput.value.length === 0) {
+                                                                nameInput.addEventListener('invalid', (e)=> {
+                                                                nameInput.setCustomValidity(`Bạn quên chưa nhập rồi này`)
+                                                                })
+                                                                nameInput.reportValidity()
+                                                                return
+                                                                }
+                                                                let descriptionInput = document.getElementById(`product-description-update`)
+                                                                if (descriptionInput.value.length === 0) {
+                                                                descriptionInput.addEventListener('invalid', (e)=> {
+                                                                descriptionInput.setCustomValidity(`Bạn quên chưa nhập rồi này`)
+                                                                })
+                                                                descriptionInput.reportValidity()
+                                                                return;
+                                                                }
+                                                                // ??? i dont even know why my code formatter format my code like this wtf??
+                                                                let productCategoryOptions = document.getElementById(`inputGroupSelect01-update`)
+                                                                // console.log(productCategoryOptions.selectedIndex)
+                                                                if(productCategoryOptions.selectedIndex === 0) {
+                                                                productCategoryOptions.addEventListener('invalid', (e)=> {
+                                                                productCategoryOptions.setCustomValidity(`Bạn quên chưa chọn rồi này`)
+                                                                })
+                                                                productCategoryOptions.reportValidity()
+                                                                return;
+                                                                }
+                                                                let productQuantity = document.getElementById(`quantity-update`)
+                                                                // console.log(productQuantity)
+                                                                if (productQuantity.value.length === 0) {
+                                                                productQuantity.addEventListener('invalid', (e)=> {
+                                                                productQuantity.setCustomValidity(`Bạn quên chưa nhập rồi này`)
+                                                                })
+                                                                productQuantity.reportValidity()
+                                                                return;
+                                                                }
+                                                                let productPrice = document.getElementById(`price-update`)
+                                                                // console.log(productPrice)
+                                                                if (productPrice.value.length === 0) {
+                                                                productPrice.addEventListener('invalid', (e)=> {
+                                                                productPrice.setCustomValidity(`Bạn quên chưa nhập rồi này`)
+                                                                })
+                                                                productPrice.reportValidity()
+                                                                return;
+                                                                }
+
+                                                                let sizeS = document.getElementById('btncheckSby' + `<%= products[i].id %>`)
+                                                                let sizeM = document.getElementById('btncheckMby'+ `<%= products[i].id %>`)
+                                                                let sizeL = document.getElementById('btncheckLby'+ `<%= products[i].id %>`)
+
+                                                                let validated = false;
+                                                                if (sizeS.checked || sizeL.checked || sizeM.checked) {
+                                                                validated = true;
+                                                                }
+                                                                if (!validated) {
+                                                                alert(`Bạn chưa chọn kích thuớc rồi!`)
+                                                                } else {
+                                                                console.log(`validated`)
+                                                                document.getElementById('updateProductForm' + `<%= products[i].id %>`).submit()
+                                                                }
+                                                                })()"
+                                                        form="<%= "updateProductForm" + products[i].id %>"
+                                                        style="border-color: #FFA500; background-color: #FFA500">Sửa
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; flex-direction: row; gap: 24px; align-content: center; justify-content: center">
+                                    <button class="link-primary"
+                                            style="border: transparent; background-color: transparent"
+                                            data-bs-target="<%= "#updateModal" + products[i].id %>"
+                                            data-bs-toggle="modal">Sửa
+                                    </button>
+                                    <button class="link-primary"
+                                            style="border: transparent; background-color: transparent"
+                                            data-bs-target="<%= "#deleteModal" + products[i].id %>"
+                                            data-bs-toggle="modal"
+                                    >Xóa
+                                    </button>
+                                    <button class="link-primary"
+                                            style="border: transparent; background-color: transparent"
+                                            data-bs-target="<%= "#detailModal" + products[i].id %>"
+                                            data-bs-toggle="modal"
+                                    >Chi tiết
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+        <footer class="py-4 bg-light mt-auto">
+            <div class="container-fluid px-4">
+                <div class="d-flex align-items-center justify-content-between small">
+                    <div class="text-muted">Copyright &copy; VeganFood</div>
+                    <div>
+                        <a href="#">Về chúng tôi</a>
+                        &middot;
+                        <a href="#">Danh sách cửa hàng</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+<script src="/js/scripts.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
+<script src="/assets/demo/chart-area-demo.js"></script>
+<script src="/assets/demo/chart-bar-demo.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>
+<script src="/js/datatables-simple-demo.js"></script>
+</body>
+</html>

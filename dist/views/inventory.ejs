@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <title>VeganFood Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet"/>
+    <link href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/buttons/2.3.2/css/buttons.dataTables.min.css" rel="stylesheet">
+    <link href="/css/styles.css" rel="stylesheet"/>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.2/js/buttons.print.min.js"></script>
+    <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
+</head>
+<body class="sb-nav-fixed">
+<%- include ('topnav.ejs') %>
+<div id="layoutSidenav">
+    <%- include ('sidenav.ejs') %>
+    <div id="layoutSidenav_content">
+        <main class="container-fluid px-4">
+            <h1 class="mt-4">Quản lý kho</h1>
+            <div>
+                <h4>Các sản phẩm bán chạy nhất</h4>
+                <table id="bestSellerTable" class="cell-border">
+                    <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Mã SP</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Số luợng đã bán</th>
+                    </tr>
+                    </thead>
+                    <tfoot>
+                    <tr>
+                        <th>STT</th>
+                        <th>Mã SP</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Số luợng đã bán</th>
+                    </tr>
+                    </tfoot>
+                    <tbody>
+                    <% for (let i = 0; i < products.length; i++) { %>
+                        <tr>
+                            <td><%= i + 1 %></td>
+                            <td><%= products[i].id %></td>
+                            <td><%= products[i].name %></td>
+                            <td><%= products[i].total %></td>
+                        </tr>
+                    <% } %>
+                    </tbody>
+                </table>
+                <h4 style="margin-top: 32px;">Các sản phẩm sắp hết hàng</h4>
+                <table id="runningOutProductsTable" class="cell-border">
+                    <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Mã SP</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Số luợng còn lại</th>
+                    </tr>
+                    </thead>
+                    <tfoot>
+                    <tr>
+                        <th>STT</th>
+                        <th>Mã SP</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Số luợng còn lại</th>
+                    </tr>
+                    </tfoot>
+                    <tbody>
+                    <% for (let i = 0; i < runningOutProds.length; i++) { %>
+                        <tr>
+                            <td><%= i + 1 %></td>
+                            <td><%= runningOutProds[i].id %></td>
+                            <td><%= runningOutProds[i].name %></td>
+                            <td><%= runningOutProds[i].quantity %></td>
+                        </tr>
+                    <% } %>
+                    </tbody>
+                </table>
+                <h4 style="margin-top: 32px;">Các sản phẩm đuợc yêu thích</h4>
+                <table id="mostLovedProductsTable" class="cell-border">
+                    <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Mã SP</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Luợt thích</th>
+                    </tr>
+                    </thead>
+                    <tfoot>
+                    <tr>
+                        <th>STT</th>
+                        <th>Mã SP</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Luợt thích</th>
+                    </tr>
+                    </tfoot>
+                    <tbody>
+                    <% for (let i = 0; i < loves.length; i++) { %>
+                        <tr>
+                            <td><%= i + 1 %></td>
+                            <td><%= loves[i].id %></td>
+                            <td><%= loves[i].name %></td>
+                            <td><%= loves[i].total %></td>
+                        </tr>
+                    <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+        <footer class="py-4 bg-light mt-auto">
+            <div class="container-fluid px-4">
+                <div class="d-flex align-items-center justify-content-between small">
+                    <div class="text-muted">Copyright &copy; VeganFood</div>
+                    <div>
+                        <a href="#">Về chúng tôi</a>
+                        &middot;
+                        <a href="#">Danh sách cửa hàng</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+<script src="/js/scripts.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
+<script src="/assets/demo/chart-area-demo.js"></script>
+<script src="/assets/demo/chart-bar-demo.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>
+<script src="/js/datatables-simple-demo.js"></script>
+</body>
+</html>

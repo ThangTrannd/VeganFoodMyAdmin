@@ -1,0 +1,351 @@
+<style>
+    div.block {
+        overflow: hidden;
+    }
+
+    div.block label {
+        width: 160px;
+        display: block;
+        float: left;
+        text-align: left;
+    }
+
+    div.block .input {
+        margin-left: 4px;
+        float: left;
+    }
+</style>
+<div class="row">
+    <div class="col-xl-3 col-md-6">
+        <div class="card bg-primary text-white mb-4">
+            <div class="card-body">Tổng số đơn hàng</div>
+            <p class="card-body ms-0 mt-0 fs-1"><%= data.total %></p>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link"></a>
+                <div class="small text-white"><i class="fas"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card text-white mb-4" style="background-color: #7e7e80; color: #7e7e80; border-color: #7e7e80">
+            <div class="card-body">Đơn hàng đang chờ</div>
+            <p class="card-body ms-0 mt-0 fs-1"><%= data.pending %></p>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="/pending-orders">Chi tiết</a>
+                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card bg-warning text-white mb-4">
+            <div class="card-body">Đơn hàng đang được giao</div>
+            <p class="card-body ms-0 mt-0 fs-1"><%= data.delivering %></p>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="/delivering-order">Chi tiết</a>
+                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card bg-success text-white mb-4">
+            <div class="card-body">Đơn hàng thành công</div>
+            <p class="card-body ms-0 mt-0 fs-1"><%= data.completed %></p>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="/completed-orders">Chi tiết</a>
+                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card bg-danger text-white mb-4">
+            <div class="card-body">Đơn hàng bị huỷ</div>
+            <p class="card-body ms-0 mt-0 fs-1"><%= data.canceled %></p>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="/canceled-orders">Chi tiết</a>
+                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xl-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-chart-area me-1"></i>
+                Doanh thu trong tháng này
+            </div>
+            <div class="card-body">
+                <canvas id="monthlyChart" width="100%" height="40"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-chart-bar me-1"></i>
+                Doanh thu trong năm nay
+            </div>
+            <div class="card-body">
+                <canvas id="myBarChart" width="100%" height="40"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-table me-1"></i>
+        Các đơn hàng
+    </div>
+
+    <div class="card-body">
+        <h4>Thống kê trong khoảng thời gian</h4>
+        <div style="margin-bottom: 32px">
+            <canvas id="chart"></canvas>
+            <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-between">
+                <div>
+                    <label for="startDate"></label><input type="date" id="startDate">
+                    <label for="endDate"></label><input type="date" id="endDate">
+                </div>
+                <div>
+                    <button onclick="filterData()" class="btn btn-warning">Thống kê</button>
+                </div>
+            </div>
+        </div>
+        <table id="datatablesSimple" class="cell-border">
+            <thead>
+            <tr>
+                <th>STT</th>
+                <th>Mã đơn hàng</th>
+                <th>Đơn hàng</th>
+                <th>Tên khách hàng</th>
+                <th>Số điện thoại</th>
+                <th>Trạng thái</th>
+                <th>Phương thức thanh toán</th>
+                <th>Hoạt động</th>
+            </tr>
+            </thead>
+            <tfoot>
+            <tr>
+                <th>STT</th>
+                <th>Mã đơn hàng</th>
+                <th>Đơn hàng</th>
+                <th>Tên khách hàng</th>
+                <th>Số điện thoại</th>
+                <th>Trạng thái</th>
+                <th>Phương thức thanh toán</th>
+                <th>Hoạt động</th>
+            </tr>
+            </tfoot>
+            <tbody>
+            <% for (var i = 0; i < orders.length; i++) { %>
+                <!-- Modal -->
+                <div class="modal fade" id="detailModal<%= orders[i].orderId %>" tabindex="-1"
+                     aria-labelledby="exampleModalLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Chi tiết đơn hàng</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body" style="display:flex; flex-direction: column">
+                                <strong>Mã đơn hàng: <%= orders[i].orderId %></strong>
+                                <strong>Tên khách hàng: <%= orders[i].username %></strong>
+                                <strong>Số điện thoại: <%= orders[i].phoneNumber %></strong>
+                                <strong>Địa chỉ: <%= orders[i].address %> </strong>
+                                <strong>Trạng thái đơn hàng: <%= orders[i].status %></strong>
+                                <strong>Trạng thái đơn hàng: <%= orders[i].provider %></strong>
+                                <strong>Lần chỉnh sửa cuối: <%= orders[i].time %></strong>
+                                <strong>Chi tiết: </strong>
+                                <div>
+                                    <hr>
+                                    <div class="w-100 h-auto" style="display: flex; flex-direction: row">
+                                        <div style="flex: 1; text-align: center; font-weight: bold">#</div>
+                                        <div style="flex: 1; text-align: center ; font-weight: bold">Tên sản phẩm</div>
+                                        <div style="flex: 1; text-align: center ; font-weight: bold">Số lượng</div>
+                                        <div style="flex: 1; text-align: center; font-weight: bold">Giá</div>
+                                        <div style="flex: 1; text-align: center; font-weight: bold">Thành tiền</div>
+                                        <div style="flex: 1; text-align: center;font-weight: bold">Tổng sau giảm giá
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <% for (var j = 0; j < orders[i].detail.length; j++) { %>
+                                        <div class="w-100 h-auto" style="display: flex; flex-direction: row">
+                                            <div style="flex: 1; text-align: center; margin-top: 16px;"><%= j + 1 %></div>
+                                            <div style="flex: 1; text-align: center ; margin-top: 16px;"><%= orders[i].detail[j].productName %></div>
+                                            <div style="flex: 1; text-align: center ; margin-top: 16px;"><%= orders[i].detail[j].quantity %></div>
+                                            <div style="flex: 1; text-align: center; margin-top: 16px"><%= orders[i].detail[j].price %></div>
+                                            <div style="flex: 1; text-align: center; margin-top: 16px;"><%= orders[i].detail[j].priceBeforeDiscount %></div>
+                                            <div style="flex: 1; text-align: center; margin-top: 16px;"><%= orders[i].detail[j].priceAfterDiscount %></div>
+                                        </div>
+                                        <hr>
+                                    <% } %>
+                                    <div class="w-100 h-auto" style="display: flex; flex-direction: row">
+                                        <div style="flex: 1; text-align: center; margin-top: 16px;"></div>
+                                        <div style="flex: 1; text-align: center ; margin-top: 16px;"></div>
+                                        <div style="flex: 1; text-align: center ; margin-top: 16px;"></div>
+                                        <div style="flex: 1; text-align: center; margin-top: 16px"></div>
+                                        <div style="flex: 1; text-align: center; margin-top: 16px;">Tổng:</div>
+                                        <div style="flex: 1; text-align: center; margin-top: 16px;"><%= orders[i].total %></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <tr>
+                    <td><%= i + 1 %></td>
+                    <td><%= orders[i].orderId %></td>
+                    <td><%= orders[i].items.join(",") %></td>
+                    <td><%= orders[i].username %></td>
+                    <td><%= orders[i].phoneNumber %></td>
+                    <td><%= orders[i].status %></td>
+                    <td><%= orders[i].provider %></td>
+                    <td style="text-align: center">
+                        <!-- Button trigger modal -->
+                        <a class="link-primary" data-bs-toggle="modal"
+                           data-bs-target="#detailModal<%= orders[i].orderId %>">
+                            Chi tiết
+                        </a>
+                    </td>
+                </tr>
+            <% } %>
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.1.1/dist/chart.umd.min.js"></script>
+<script>
+    document.getElementById('startDate').valueAsDate = new Date();
+    document.getElementById('endDate').valueAsDate = new Date();
+    const context = document.getElementById("chart")
+    let chart;
+
+    function filterData() {
+        fetch("https://tocotea-web.onrender.com/api/statistical/bar-chart").then(fetchedData => {
+            document.getElementById("startDate").style.pointerEvents = "none"
+            document.getElementById("endDate").style.pointerEvents = "none"
+            return fetchedData.json()
+        }).then(fetchedData => {
+            {
+
+                context.style.visibility = "hidden"
+                let labels = fetchedData.labels
+                const data = fetchedData.data
+                const startDate = new Date(document.getElementById("startDate").value).setHours(0, 0, 0, 0)
+                const endDate = new Date(document.getElementById("endDate").value).setHours(0, 0, 0, 0)
+                const colors = []
+                for (let i = 0; i < labels.length; i++) {
+                    const r = Math.floor(Math.random() * 255);
+                    const g = Math.floor(Math.random() * 255);
+                    const b = Math.floor(Math.random() * 255);
+                    colors.push('rgba(' + r + "," + g + "," + b + ", 0.2)")
+                }
+                labels = labels.map(item => {
+                    item = item.toString().split("-")
+                    return new Date(item[1] + "/" + item[0] + "/" + item[2]).setHours(0, 0, 0, 0)
+                })
+                console.log(labels)
+                let filteredLabels = labels.filter(item => (item >= startDate && item <= endDate))
+                console.log(filteredLabels)
+
+                const startArray = labels.indexOf(filteredLabels[0])
+                const endArray = labels.indexOf(filteredLabels[filteredLabels.length - 1])
+
+                const filteredData = [...data]
+                filteredData.splice(endArray + 1, filteredLabels.length)
+                filteredData.splice(0, startArray)
+                console.log(filteredData)
+                filteredLabels = filteredLabels.map(item=> {
+                    console.log(item)
+                    console.log(new Date(item))
+                    return new Date(item).toLocaleDateString("vi-VN")
+                })
+                chart.config = {
+                    type: 'bar',
+                    data: {
+                        labels: filteredLabels,
+                        datasets: [{
+                            label: 'Thu nhập',
+                            data: filteredData,
+                            backgroundColor: colors,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                }
+                context.style.visibility = "visible"
+                chart.update()
+                document.getElementById("startDate").style.pointerEvents = "all"
+                document.getElementById("endDate").style.pointerEvents = "all"
+            }
+        })
+    }
+
+
+    fetch("https://tocotea-web.onrender.com/api/statistical/bar-chart").then(fetchedData => fetchedData.json()).then(fetchedData => {
+        {
+            const context = document.getElementById("chart")
+            const labels = fetchedData.labels
+            const data = fetchedData.data
+            const colors = []
+            for (let i = 0; i < labels.length; i++) {
+                const r = Math.floor(Math.random() * 255);
+                const g = Math.floor(Math.random() * 255);
+                const b = Math.floor(Math.random() * 255);
+                colors.push('rgba(' + r + "," + g + "," + b + ", 0.2)")
+            }
+            let config = {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Thu nhập',
+                        data: data,
+                        backgroundColor: colors,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            }
+            chart = new Chart(context, config)
+            Chart.plugins.register({
+                afterDraw: function(chart) {
+                    if (chart.data.labels.length === 0) {
+                        let ctx = chart.chart.ctx;
+                        let width = chart.chart.width;
+                        let height = chart.chart.height;
+
+                        chart.clear();
+                        ctx.save();
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('Có vẻ như ngày nhập vào không hợp lệ hoặc không có dữ liệu để hiển thị!', width / 2, height / 2);
+                        ctx.restore();
+                    }
+                }
+            });
+            chart.update()
+        }
+    })
+
+</script>

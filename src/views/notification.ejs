@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <title>VeganFood Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet"/>
+    <link href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/buttons/2.3.2/css/buttons.dataTables.min.css" rel="stylesheet">
+    <link href="/css/styles.css" rel="stylesheet"/>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.2/js/buttons.print.min.js"></script>
+    <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
+</head>
+<body class="sb-nav-fixed">
+<%- include ('topnav.ejs') %>
+<div id="layoutSidenav">
+    <%- include ('sidenav.ejs') %>
+    <div id="layoutSidenav_content">
+        <main class="container-fluid px-4">
+            <h1 class="mt-4">Quản lý thông báo</h1>
+            <div class="top-buttons mt-3"
+                 style="display: flex; flex-direction: row; align-content: baseline; justify-content: space-between; gap: 10%">
+                <div class="input-group mb-3 rounded-3" style="gap: 0; max-width: 40%; visibility: hidden">
+                    <span class="input-group-text"><i
+                                class="fa-solid fa-magnifying-glass"></i></span>
+                    <input type="text" class="form-control"
+                           placeholder="Tìm kiếm" aria-label="...">
+                    <span class="input-group-text"><i
+                                class="fa-solid fa-sliders"></i></span>
+                </div>
+                <div class="input-group mb-3 align-content-end justify-content-end" style="max-width: 25%">
+                    <!-- Modal -->
+                    <div class="modal fade" id="addNotification" tabindex="-1" aria-labelledby="exampleModalLabel"
+                         aria-hidden="true">
+                        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Tạo thông báo mới</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="/notification/add" method="post" enctype="multipart/form-data"
+                                          name="addNotificationForm" id="addNotificationForm">
+                                        <div class="mb-3">
+                                            <label for="title" class="form-label">Tiêu đề</label>
+                                            <input type="text" class="form-control" id="title" name="title"
+                                                   aria-describedby="emailHelp">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="message" class="form-label">Nội dung</label>
+                                            <input type="text" class="form-control" id="message" name="message">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="exampleInputPassword1" class="form-label">Chọn ảnh</label>
+                                            <input type="file" class="form-control" id="inputGroupFile01" name="image">
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="type" value="Tin tức"
+                                                   id="type">
+                                            <label class="form-check-label" for="flexRadioDefault1">
+                                                Thông báo tin tức
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="type" value="Khuyến mại"
+                                                   id="type" checked>
+                                            <label class="form-check-label" for="flexRadioDefault2">
+                                                Thông báo khuyến mại
+                                            </label>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng
+                                    </button>
+                                    <button type="submit" form="addNotificationForm" class="btn btn-primary">Gửi thông
+                                        báo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button data-bs-toggle="modal" data-bs-target="#addNotification"
+                            class="btn-primary p-2 rounded-3" style="background-color: #FFA500; border-color: #FFA500">
+                        Tạo thông báo mới
+                    </button>
+                </div>
+            </div>
+            <table id="notificationsTable" class="border-cell">
+                <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Tiêu đề</th>
+                    <th>Nội dung</th>
+                    <th>Kiểu</th>
+                    <th>Hành động</th>
+                </tr>
+                </thead>
+                <tfoot>
+                <tr>
+                    <th>STT</th>
+                    <th>Tiêu đề</th>
+                    <th>Nội dung</th>
+                    <th>Kiểu</th>
+                    <th>Hành động</th>
+                </tr>
+                </tfoot>
+                <tbody>
+                <% for (var i = 0; i < notifications.length; i++) { %>
+                    <!-- Delete Modal -->
+                    <div class="modal fade " id="<%= "deleteModal" + notifications[i].id %>" tabindex="-1"
+                         aria-labelledby="detailModal" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-scrollable modal-xl modal-dialog-centered"
+                             style="text-align: start">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Xóa</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Xác nhận xoá <%= notifications[i].id %></p>
+                                </div>
+                                <div class="modal-footer">
+                                    <form name="<%= "deleteNotification" + notifications[i].id %>"
+                                          enctype="application/x-www-form-urlencoded"
+                                          id="<%= "deleteNotification" + notifications[i].id %>"
+                                          method="post"
+                                          action="/notification/delete">
+                                        <input type="text" style="display: none" name="id"
+                                               aria-label="..."
+                                               value="<%= notifications[i].id %>">
+                                    </form>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                        Huỷ
+                                    </button>
+                                    <button type="submit" class="btn btn-primary"
+                                            form="<%= "deleteNotification" + notifications[i].id %>"
+                                            style="background-color: #FFA500; border-color: #FFA500"
+                                    >Xoá
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Detail Modal -->
+                    <div class="modal fade" id="detailModal<%= notifications[i].id %>" tabindex="-1"
+                         aria-labelledby="exampleModalLabel"
+                         aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Chi tiết thông báo</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body" style="display:flex; flex-direction: column">
+                                    <strong>Tiêu đề: <%= notifications[i].title %></strong>
+                                    <strong>Nội dung: <%= notifications[i].message %></strong>
+                                    <span><img src="<%= notifications[i].image %>"
+                                               style="width: 1080px; height: 1920px; object-fit: contain" alt="..."></span>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <tr>
+                        <td><%= i + 1%></td>
+                        <td><%= notifications[i].title%></td>
+                        <td><%= notifications[i].message%></td>
+                        <td><%= notifications[i].type%></td>
+                        <td style="text-align: center">
+                            <!-- Button trigger detail modal -->
+                            <a class="link-primary" data-bs-toggle="modal" style="margin-right: 16px;"
+                               data-bs-target="#detailModal<%= notifications[i].id %>">
+                                Chi tiết
+                            </a>
+                            <a class="link-primary" data-bs-toggle="modal"
+                               data-bs-target="#deleteModal<%= notifications[i].id %>">
+                                Xóa
+                            </a>
+                        </td>
+                    </tr>
+                <% } %>
+                </tbody>
+            </table>
+        </main>
+        <footer class="py-4 bg-light mt-auto">
+            <div class="container-fluid px-4">
+                <div class="d-flex align-items-center justify-content-between small">
+                    <div class="text-muted">Copyright &copy; VeganFood</div>
+                    <div>
+                        <a href="#">Về chúng tôi</a>
+                        &middot;
+                        <a href="#">Danh sách cửa hàng</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+<script src="/js/scripts.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>
+<script src="/js/datatables-simple-demo.js"></script>
+</body>
+</html>

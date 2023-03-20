@@ -1,0 +1,5 @@
+/process.env
+/node_modules
+/typings
+#/dist
+/typings.json
