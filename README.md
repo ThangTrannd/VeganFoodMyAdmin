@@ -16,7 +16,7 @@ App chạy ở localhost:3000
 
 ### Nếu bạn không biết bash script
 #### 1. Clone project  
-    git clone https://github.com/hieunv1207/WedDATN.git
+    git clone https://github.com/ThangTrannd/VeganFoodMyAdmin.git
 
     
 
