@@ -5,19 +5,18 @@ const storage_1 = require("firebase/storage");
 const postgre_1 = require("../postgre");
 const ProductCategory_1 = require("../postgre/ProductCategory");
 function productCategoryRoute(app, upload) {
-    app.get('/category', (req, res) => {
+    app.get("/category", (req, res) => {
         // if (req.session.userid === 'admin') {
         //     res.render('product_category')
         // } else {
         //     res.redirect('/login')
         // }
         (0, postgre_1.getProductCategories)().then(r => {
-            console.log(r);
-            res.render('product_category', { categories: r.result });
+            res.render("product_category", { categories: r.result });
         });
         // res.render('product_category')
     });
-    app.post("/update_product_category", upload.single('image'), (req, res) => {
+    app.post("/update_product_category", upload.single("image"), (req, res) => {
         // console.log(req.body)
         const { id, name, description } = req.body;
         if (!req.file) {
@@ -29,7 +28,7 @@ function productCategoryRoute(app, upload) {
                 modifiedAt: null,
                 createAt: null
             }).then(r => {
-                res.redirect('/category');
+                res.redirect("/category");
             }).catch(e => {
                 res.end(e.toString());
             });
@@ -44,13 +43,12 @@ function productCategoryRoute(app, upload) {
         const uploadTask = (0, storage_1.uploadBytesResumable)(storageRef, req.file.buffer, metadata);
         uploadTask.on("state_changed", (snapshot) => {
             const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            console.log('Upload is ' + progress + '% done');
             switch (snapshot.state) {
-                case 'paused':
-                    console.log('Upload is paused');
+                case "paused":
+                    console.log("Upload is paused");
                     break;
-                case 'running':
-                    console.log('Upload is running');
+                case "running":
+                    console.log("Upload is running");
                     break;
             }
         }, (error) => {
@@ -73,7 +71,7 @@ function productCategoryRoute(app, upload) {
             });
         });
     });
-    app.post("/add_category", upload.single('image'), (req, res) => {
+    app.post("/add_category", upload.single("image"), (req, res) => {
         if (!req.file) {
             res.end("File required");
         }
@@ -87,13 +85,12 @@ function productCategoryRoute(app, upload) {
         const uploadTask = (0, storage_1.uploadBytesResumable)(storageRef, req.file.buffer, metadata);
         uploadTask.on("state_changed", (snapshot) => {
             const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            console.log('Upload is ' + progress + '% done');
             switch (snapshot.state) {
-                case 'paused':
-                    console.log('Upload is paused');
+                case "paused":
+                    console.log("Upload is paused");
                     break;
-                case 'running':
-                    console.log('Upload is running');
+                case "running":
+                    console.log("Upload is running");
                     break;
             }
         }, (error) => {

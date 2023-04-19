@@ -2,132 +2,132 @@ import {Application, Request, Response} from "express";
 import dotenv from "dotenv";
 import {createException, createResult, isAdminLogin} from "../postgre";
 import {updateAdminLastLogin} from "../postgre/Admin";
-import nodemailer from 'nodemailer';
-import {google} from 'googleapis'
+import nodemailer from "nodemailer";
+import {google} from "googleapis";
 import {isEmailHasTaken} from "../postgre/User";
 import jwt from "jsonwebtoken";
 import {PostgreSQLConfig} from "../config/posgre";
 import {resetPassword} from "../postgre/ResetPassword";
-import { Pool } from "pg";
+import {Pool} from "pg";
 
 dotenv.config({
-    path: "process.env"
-})
+	path: "process.env"
+});
 
 export function loginRoute(app: Application) {
-    app.get("/login", (req: Request, res: Response) => {
-        if (req.session.userid !== 'admin') {
-            res.render("login", {isError: false})
-        } else {
-            res.redirect("/")
-        }
-    });
+	app.get("/login", (req: Request, res: Response) => {
+		if (req.session.userid !== "admin") {
+			res.render("login", {isError: false});
+		} else {
+			res.redirect("/");
+		}
+	});
 }
 
 
 export function loginPostRoute(app: Application, session: any) {
-    app.post("/login", async (req: Request, res: Response) => {
-            const {username, password} = req.body
-            const isLoginValid = isAdminLogin(username, password, req.clientIp)
-            isLoginValid.then(r => {
-                updateAdminLastLogin().then(r1 => {
-                    if (r) {
-                        session = req.session
-                        session.userid = username
-                        req.session.save()
-                        res.redirect("/")
-                    } else {
-                        res.render("login", {isError: true})
-                    }
-                }).catch(e => {
-                    console.log(e)
-                })
-            }).catch(e => {
-                console.log(e)
-            })
-        }
-    )
+	app.post("/login", async (req: Request, res: Response) => {
+		const {username, password} = req.body;
+		const isLoginValid = isAdminLogin(username, password, req.clientIp);
+		isLoginValid.then(r => {
+			updateAdminLastLogin().then(r1 => {
+				if (r) {
+					session = req.session;
+					session.userid = username;
+					req.session.save();
+					res.redirect("/");
+				} else {
+					res.render("login", {isError: true});
+				}
+			}).catch(e => {
+				console.log(e);
+			});
+		}).catch(e => {
+			console.log(e);
+		});
+	}
+	);
 }
 
 export function logoutRoute(app: Application) {
-    app.get("/logout", (req: Request, res: Response) => {
-        req.session.destroy((err) => {
-            if (err)
-                throw err
-            else
-                res.redirect("/")
-        })
-    })
+	app.get("/logout", (req: Request, res: Response) => {
+		req.session.destroy((err) => {
+			if (err)
+				throw err;
+			else
+				res.redirect("/");
+		});
+	});
 }
 
 export async function sendResetPasswordEmail(email: string): Promise<APIResponse<boolean>> {
-    let _isEmailExist = await isEmailHasTaken(email)
+	const _isEmailExist = await isEmailHasTaken(email);
 
-    if (!_isEmailExist) {
-        return createException("Không tìm thấy email của bạn")
-    }
-    const CLIENT_ID = process.env.GOOGLE_API_CLIENT_ID
-    const CLIENT_SECRET = process.env.GOOGLE_API_CLIENT_SECRET
-    const REDIRECTED_URI = process.env.GOOGLE_API_REDIRECT_URL
-    const REFRESH_TOKEN = process.env.GOOGLE_API_REFRESH_TOKEN
+	if (!_isEmailExist) {
+		return createException("Không tìm thấy email của bạn");
+	}
+	const CLIENT_ID = process.env.GOOGLE_API_CLIENT_ID;
+	const CLIENT_SECRET = process.env.GOOGLE_API_CLIENT_SECRET;
+	const REDIRECTED_URI = process.env.GOOGLE_API_REDIRECT_URL;
+	const REFRESH_TOKEN = process.env.GOOGLE_API_REFRESH_TOKEN;
 
-    const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECTED_URI)
-    oAuth2Client.setCredentials({
-        refresh_token: REFRESH_TOKEN
-    })
+	const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECTED_URI);
+	oAuth2Client.setCredentials({
+		refresh_token: REFRESH_TOKEN
+	});
 
-    const _jwtToken = jwt.sign({email: email}, process.env.JWT_SECRET!)
+	const _jwtToken = jwt.sign({email: email}, process.env.JWT_SECRET!);
 
-    try {
-        const accessToken = await oAuth2Client.getAccessToken()
+	try {
+		const accessToken = await oAuth2Client.getAccessToken();
 
-        const transport = nodemailer.createTransport({
-            // @ts-ignore
-            service: 'gmail',
-            auth: {
-                type: "OAuth2",
-                user: 'nongngocdieu20122002@gmail.com',
-                clientId: CLIENT_ID,
-                clientSecret: CLIENT_SECRET,
-                refreshToken: REFRESH_TOKEN,
-                accessToken: accessToken
-            }
-        })
-        const mailOption = {
-            from: "Support <support@tocotea.software>",
-            to: email,
-            subject: "Đặt lại mật khẩu cho VeganFood",
-            text: "Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn",
-            html: emailTemplate(_jwtToken)
-        }
-        const result = await transport.sendMail(mailOption)
-        return createResult("Một email đặt lại mật khẩu đã được gửi tới hòm thư của bạn, kiểm tra hòm thư và làm theo hướng dẫn!")
-    } catch (e) {
-        throw createException(e)
-    }
+		const transport = nodemailer.createTransport({
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			service: "Gmail",
+			auth: {
+				type: "OAuth2",
+				user: "nongngocdieu20122002@gmail.com",
+				clientId: CLIENT_ID,
+				clientSecret: CLIENT_SECRET,
+				refreshToken: REFRESH_TOKEN,
+				accessToken: accessToken
+			}
+		});
+		const mailOption = {
+			from: "Support <support@veganfood.pimob.me>",
+			to: email,
+			subject: "Đặt lại mật khẩu cho VeganFood",
+			text: "Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn",
+			html: emailTemplate(_jwtToken)
+		};
+		const result = await transport.sendMail(mailOption);
+		return createResult("Một email đặt lại mật khẩu đã được gửi tới hòm thư của bạn, kiểm tra hòm thư và làm theo hướng dẫn!");
+	} catch (e) {
+		throw createException(e);
+	}
 
 }
 
 export async function userResetPassword(email: string): Promise<APIResponse<any>> {
-    try {
-        let _isEmailExist = await isEmailHasTaken(email)
+	try {
+		const _isEmailExist = await isEmailHasTaken(email);
 
-        if (!_isEmailExist) {
-            return createException("Không tìm thấy email của bạn")
-        }
-        const connection = await new Pool(PostgreSQLConfig)
-        let id = await connection.query(`select id from "User" where email = '${email}'`)
-        console.log(id.rows[0].id)
-        await resetPassword(id.rows[0].id)
-        return createResult("")
-    } catch (e) {
-        return createException(e)
-    }
+		if (!_isEmailExist) {
+			return createException("Không tìm thấy email của bạn");
+		}
+		const connection = await new Pool(PostgreSQLConfig);
+		const id = await connection.query(`select id from "User" where email = '${email}'`);
+		await resetPassword(id.rows[0].id);
+		return createResult("");
+	} catch (e) {
+		return createException(e);
+	}
 }
 
 
 function emailTemplate(token: string): string {
-    return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+	return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html data-editor-version="2" class="sg-campaigns" xmlns="http://www.w3.org/1999/xhtml">
     <head>
       <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -469,7 +469,7 @@ body {font-family: 'Chivo', sans-serif;}
         </div>
       </center>
     </body>
-  </html>`
+  </html>`;
 }
 
 

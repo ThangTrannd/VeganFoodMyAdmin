@@ -6,35 +6,35 @@ var del = require("del");
 
 // Task which would transpile typescript to javascript
 gulp.task("typescript", function () {
-    return tsProject.src().pipe(tsProject()).js.pipe(gulp.dest("dist"));
+	return tsProject.src().pipe(tsProject()).js.pipe(gulp.dest("dist"));
 });
 
 // Task which would delete the old dist directory if present
 gulp.task("build-clean", function () {
-    return del(["./dist"]);
+	return del(["./dist"]);
 });
 
 // Task which would just create a copy of the current views directory in dist directory
 gulp.task("views", function () {
-    return gulp.src("./src/views/**/*.ejs").pipe(gulp.dest("./dist/views"));
+	return gulp.src("./src/views/**/*.ejs").pipe(gulp.dest("./dist/views"));
 });
 
 // Task which would just create a copy of the current static assets directory in dist directory
 gulp.task("assets", function () {
-    return gulp.src("./src/public/assets/**/*").pipe(gulp.dest("./dist/public/assets"));
+	return gulp.src("./src/public/assets/**/*").pipe(gulp.dest("./dist/public/assets"));
 });
 
 // Task which would just create a copy of the current static assets directory in dist directory
 gulp.task("css", function () {
-    return gulp.src("./src/public/css/**/*").pipe(gulp.dest("./dist/public/css"));
+	return gulp.src("./src/public/css/**/*").pipe(gulp.dest("./dist/public/css"));
 });
 
 // Task which would just create a copy of the current static assets directory in dist directory
 gulp.task("js", function () {
-    return gulp.src("./src/public/js/**/*").pipe(gulp.dest("./dist/public/js"));
+	return gulp.src("./src/public/js/**/*").pipe(gulp.dest("./dist/public/js"));
 });
 
 // The default task which runs at start of the gulpfile.js
-gulp.task("default", gulp.series("build-clean","typescript", "views", "assets", "css", "js"), () => {
-    console.log("Done");
+gulp.task("default", gulp.series("build-clean", "typescript", "views", "assets", "css", "js"), () => {
+	console.log("Done");
 });

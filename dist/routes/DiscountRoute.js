@@ -6,9 +6,7 @@ const postgre_1 = require("../postgre");
 const Discount_1 = require("../postgre/Discount");
 function discountRoute(app, upload) {
     app.get("/discount", async (req, res) => {
-        console.log("getting discount ...");
-        let discounts = await (0, postgre_1.getDiscounts)();
-        console.log("DISCOUNT", discounts);
+        const discounts = await (0, postgre_1.getDiscounts)();
         res.render("discount", { discounts: discounts.result });
     });
     app.post("/delete_discount", (req, res) => {
@@ -18,7 +16,7 @@ function discountRoute(app, upload) {
             res.end(e.toString());
         });
     });
-    app.post("/add_discount", upload.single('image'), (req, res) => {
+    app.post("/add_discount", upload.single("image"), (req, res) => {
         if (!req.file) {
             res.end("File required");
         }
@@ -33,13 +31,12 @@ function discountRoute(app, upload) {
         const uploadTask = (0, storage_1.uploadBytesResumable)(storageRef, req.file.buffer, metadata);
         uploadTask.on("state_changed", (snapshot) => {
             const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            console.log('Upload is ' + progress + '% done');
             switch (snapshot.state) {
-                case 'paused':
-                    console.log('Upload is paused');
+                case "paused":
+                    console.log("Upload is paused");
                     break;
-                case 'running':
-                    console.log('Upload is running');
+                case "running":
+                    console.log("Upload is running");
                     break;
             }
         }, (error) => {
@@ -90,13 +87,12 @@ function discountRoute(app, upload) {
         const uploadTask = (0, storage_1.uploadBytesResumable)(storageRef, req.file.buffer, metadata);
         uploadTask.on("state_changed", (snapshot) => {
             const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            console.log('Upload is ' + progress + '% done');
             switch (snapshot.state) {
-                case 'paused':
-                    console.log('Upload is paused');
+                case "paused":
+                    console.log("Upload is paused");
                     break;
-                case 'running':
-                    console.log('Upload is running');
+                case "running":
+                    console.log("Upload is running");
                     break;
             }
         }, (error) => {
@@ -114,7 +110,6 @@ function discountRoute(app, upload) {
                     discountPercent: discountPercent,
                     active: true
                 }).then(r1 => {
-                    console.log(r1);
                     res.redirect("/discount");
                 }).catch(e => {
                     res.end(e.toString());

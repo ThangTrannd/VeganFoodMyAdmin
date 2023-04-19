@@ -29,6 +29,38 @@
         <main class="container-fluid px-4">
             <h1 class="mt-4">Quản lý kho</h1>
             <div>
+                <h4>Sản phẩm sắp hết hạn</h4>
+                <table id="endDateTable" class="cell-border">
+                    <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Mã SP</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày còn lại</th>
+                    </tr>
+                    </thead>
+                    <tfoot>
+                    <tr>
+                        <th>STT</th>
+                        <th>Mã SP</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày còn lại</th>
+                    </tr>
+                    </tfoot>
+                    <tbody>
+                    <% for (let i = 0; i < endDate.length; i++) { %>
+                        <tr>
+                            <td><%= i + 1 %></td>
+                            <td><%= endDate[i].id %></td>
+                            <td><%= endDate[i].name %></td>
+                            <td><%= endDate[i].active %></td>
+                            <td><%= endDate[i].enddate %></td>
+                        </tr>
+                    <% } %>
+                    </tbody>
+                </table>
                 <h4>Các sản phẩm bán chạy nhất</h4>
                 <table id="bestSellerTable" class="cell-border">
                     <thead>

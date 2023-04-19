@@ -12,15 +12,15 @@ async function resetPassword(userId) {
     const connection = await new pg_1.Pool(posgre_1.PostgreSQLConfig);
     const encryptedPassword = (0, md5_1.default)("password");
     try {
-        await connection.query(`begin`);
+        await connection.query("begin");
         await connection.query(`update "User"
                                 set password = '${encryptedPassword}'
                                 where id = ${userId}`);
-        await connection.query(`commit`);
+        await connection.query("commit");
         return (0, index_1.createResult)("Đặt lại mật khẩu thành công! Kiểm tra email của bạn!");
     }
     catch (e) {
-        await connection.query(`rollback`);
+        await connection.query("rollback");
         return (0, index_1.createException)(e);
     }
 }

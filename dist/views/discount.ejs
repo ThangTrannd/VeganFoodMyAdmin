@@ -81,15 +81,15 @@
                                                aria-describedby="basic-addon3" name="description" required>
                                     </div>
                                     <script>
-                                        window.onload = () => {
-                                            let labelDiscount = document.getElementById("discountPercentLabel")
-                                            let discountRange = document.getElementById("discountPercent")
-                                            discountRange.value = 50
-                                            labelDiscount.innerHTML = discountRange.value
-                                            discountRange.oninput = () => {
-                                                labelDiscount.innerHTML = "Phần trăm giảm: " + discountRange.value
-                                            }
+                                      window.onload = () => {
+                                        let labelDiscount = document.getElementById("discountPercentLabel")
+                                        let discountRange = document.getElementById("discountPercent")
+                                        discountRange.value = 50
+                                        labelDiscount.innerHTML = discountRange.value
+                                        discountRange.oninput = () => {
+                                          labelDiscount.innerHTML = "Phần trăm giảm: " + discountRange.value
                                         }
+                                      }
                                     </script>
                                     <label for="discountPercent" class="form-label" id="discountPercentLabel">Phần trăm
                                         giảm: </label>
@@ -186,16 +186,16 @@
                                          style="text-align: start">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title" id="exampleModalLabel">Xóa</h5>
+                                                <h5 class="modal-title" id="exampleModalLabel">Ngừng hoạt động</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                         aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
-                                                <p>Xác nhận xoá mã <%= discounts[i].name %>?</p>
-                                                <p>Xóa bỏ mã giảm giá không làm mất các chương trình giảm giá được áp
-                                                    dụng trên các sản phẩm hiện đang được bày bán. Để xoá bỏ mã giảm giá
-                                                    trên sản phẩm, thử xoá và thêm lại sản phẩm nhưng không chọn mã giảm
-                                                    giá</p>
+                                                <p>Xác nhận ngừng hoạt động <%= discounts[i].name %>?</p>
+                                                <!--                                                <p>Ngừng hoạt động bỏ mã giảm giá không làm mất các chương trình giảm giá được áp-->
+                                                <!--                                                    dụng trên các sản phẩm hiện đang được bày bán. Để ngừng hoạt động bỏ mã giảm giá-->
+                                                <!--                                                    trên sản phẩm, thử xoá và thêm lại sản phẩm nhưng không chọn mã giảm-->
+                                                <!--                                                    giá</p>-->
                                             </div>
                                             <div class="modal-footer">
                                                 <form name="<%= "deleteDiscountForm" + discounts[i].id %>"
@@ -213,7 +213,7 @@
                                                 <button type="submit" class="btn btn-primary"
                                                         form="<%= "deleteDiscountForm" + discounts[i].id %>"
                                                         style="background-color: #FFA500; border-color: #FFA500"
-                                                >Xoá
+                                                >Xác nhận
                                                 </button>
                                             </div>
                                         </div>
@@ -253,15 +253,15 @@
                                                                required>
                                                     </div>
                                                     <script>
-                                                        window.onload = () => {
-                                                            let labelDiscount = document.getElementById("discountPercentLabel" + discounts[i].id)
-                                                            let discountRange = document.getElementById("discountPercent")
-                                                            discountRange.value = 50
-                                                            labelDiscount.innerHTML = discountRange.value
-                                                            discountRange.oninput = () => {
-                                                                labelDiscount.innerHTML = "Phần trăm giảm: " + discountRange.value
-                                                            }
+                                                      window.onload = () => {
+                                                        let labelDiscount = document.getElementById("discountPercentLabel" + discounts[i].id)
+                                                        let discountRange = document.getElementById("discountPercent")
+                                                        discountRange.value = 50
+                                                        labelDiscount.innerHTML = discountRange.value
+                                                        discountRange.oninput = () => {
+                                                          labelDiscount.innerHTML = "Phần trăm giảm: " + discountRange.value
                                                         }
+                                                      }
                                                     </script>
                                                     <output for="discountPercent" class="form-label"
                                                             id="discountPercentLabel">Phần
@@ -310,7 +310,7 @@
                                             data-bs-target="<%= "#deleteModal" + discounts[i].id %>"
                                             data-bs-toggle="modal"
                                             form="<%= "deleteDiscountForm" + discounts[i].id %>"
-                                    >Xóa
+                                    >Ngừng hoạt động
                                     </button>
                                     <button class="link-primary"
                                             style="border: transparent; background-color: transparent"

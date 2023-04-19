@@ -51,7 +51,7 @@ function API(app) {
     });
     app.post("/api/update_user_info", (req, res) => {
         const { token, name, username, email, phoneNumber } = req.body;
-        for (let item of [token, name, username, email, phoneNumber]) {
+        for (const item of [token, name, username, email, phoneNumber]) {
             if (item == undefined) {
                 res.json((0, postgre_1.createException)("Du lieu nhap vao khong dung"));
                 return;
@@ -145,7 +145,6 @@ function API(app) {
     });
     app.post("/api/product_category", (req, res) => {
         const { id } = req.body;
-        console.log("This is test " + 101);
         console.log(req.body);
         (0, postgre_1.getProductCategory)(Number(id)).then(r => {
             res.json(r);
@@ -168,7 +167,7 @@ function API(app) {
             res.json((0, postgre_1.createException)(e));
         });
     });
-    app.post('/api/login', async (req, res) => {
+    app.post("/api/login", async (req, res) => {
         const { username, password, type, token_device } = req.body;
         (0, postgre_1.getUserLoginInfo)(username, password, type, token_device).then(r => {
             res.json(r);
@@ -176,7 +175,7 @@ function API(app) {
             res.json((0, postgre_1.createException)(e));
         });
     });
-    app.post('/api/signup', async (req, res) => {
+    app.post("/api/signup", async (req, res) => {
         const { username, password, email, phoneNumber, name } = req.body;
         if (username == undefined || username.toString() == "") {
             res.json((0, postgre_1.createException)("Chua nhap ten nguoi dung!"));
@@ -318,10 +317,7 @@ function API(app) {
         });
     });
     app.post("/api/shopping_session/items", (req, res) => {
-        console.log(req.body);
         const { token, sessionId } = req.body;
-        console.log(token);
-        console.log(sessionId);
         if (!validateToken(token)) {
             res.json(returnInvalidToken());
             return;
@@ -468,7 +464,6 @@ function API(app) {
         const userId = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET).id;
         const checkFav = await (0, LovedProducts_1.isUserLovedProduct)(userId, productId);
         if (checkFav.result) {
-            console.log(checkFav);
             res.status(400);
         }
         (0, LovedProducts_1.addLovedItem)(userId, productId).then(r => {
@@ -487,15 +482,13 @@ function API(app) {
         });
     });
     app.get("/api/user/reset_password/", (req, res) => {
-        let token = req.query.token;
+        const token = req.query.token;
         if (!validateToken(token)) {
             res.end("INVALID TOKEN");
         }
         // im so fucking lazy :>
         const email = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
-        console.log(email);
         (0, AuthenticationRoute_1.userResetPassword)(email.email).then(r => {
-            console.log(r);
             res.end("Mật khẩu đã được đặt về mặc định là 'password' (không có dấu nháy đơn)!");
         }).catch(e => {
             res.end("Lỗi không thể đặt lại mật khẩu: " + e.toString());
@@ -541,8 +534,8 @@ function API(app) {
         });
     });
     app.get("/api/statistical/monthly-chart", (req, res) => {
-        res.header('Content-Type: application/json');
-        res.header('Access-Control-Allow-Origin: *');
+        res.header("Content-Type: application/json");
+        res.header("Access-Control-Allow-Origin: *");
         (0, Statistical_1.getMonthlyChart)().then(r => {
             res.json(r);
         }).catch(e => {
@@ -555,8 +548,8 @@ function API(app) {
         });
     });
     app.get("/api/statistical/yearly-chart", (req, res) => {
-        res.header('Content-Type: application/json');
-        res.header('Access-Control-Allow-Origin: *');
+        res.header("Content-Type: application/json");
+        res.header("Access-Control-Allow-Origin: *");
         (0, Statistical_1.getYearlyChart)().then(r => {
             res.json(r);
         }).catch(e => {

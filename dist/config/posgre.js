@@ -8,7 +8,7 @@ const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config({
     path: "process.env"
 });
-const isProduction = process.env.PRODUCTION === 'true';
+const isProduction = process.env.PRODUCTION === "true";
 console.log(process.env.PRODUCTION);
 const productionConf = {
     connectionString: "postgres://hieu:ISUhPDo15lS1x955YwlCimtAE3cvhlOC@dpg-cfctgjsgqg43t5g62lug-a/veganfood"

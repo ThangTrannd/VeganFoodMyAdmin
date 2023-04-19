@@ -158,18 +158,21 @@
                                         </button>
                                         <button type="submit" class="btn btn-primary"
                                                 form="<%= "confirmOrder" + orders[i].orderId %>"
-                                                style="background-color: #FFA500; border-color: #FFA500">Xác nhận</button>
+                                                style="background-color: #FFA500; border-color: #FFA500">Xác nhận
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <!-- Cancel Modal -->
-                        <div class="modal fade" id="cancelModal<%= orders[i].orderId %>" tabindex="-1" aria-labelledby="exampleModalLabel"
+                        <div class="modal fade" id="cancelModal<%= orders[i].orderId %>" tabindex="-1"
+                             aria-labelledby="exampleModalLabel"
                              aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLabel">Hủy đơn hàng số <%= orders[i].orderId %>?</h5>
+                                        <h5 class="modal-title" id="exampleModalLabel">Hủy đơn hàng
+                                            số <%= orders[i].orderId %>?</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                 aria-label="Close"></button>
                                     </div>
@@ -197,7 +200,8 @@
                                         </button>
                                         <button type="submit" class="btn btn-primary"
                                                 form="<%= "cancelOrder" + orders[i].orderId %>"
-                                                style="background-color: #FFA500; border-color: #FFA500">Hủy</button>
+                                                style="background-color: #FFA500; border-color: #FFA500">Hủy
+                                        </button>
                                     </div>
                                 </div>
                             </div>

@@ -7,16 +7,15 @@ const pg_1 = require("pg");
 async function addProductCategory(productCategory) {
     const connection = await new pg_1.Pool(posgre_1.PostgreSQLConfig);
     try {
-        await connection.query(`begin`);
-        let result = await connection.query(`INSERT INTO "ProductCategory"
-                                             values (default,
-                                                     '${productCategory.name}',
-                                                     '${productCategory.description}',
-                                                     '${productCategory.displayImage}',
-                                                     now(),
-                                                     now())`);
-        console.log(result);
-        await connection.query(`commit`);
+        await connection.query("begin");
+        const result = await connection.query(`INSERT INTO "ProductCategory"
+                                            values (default,
+                                                    '${productCategory.name}',
+                                                    '${productCategory.description}',
+                                                    '${productCategory.displayImage}',
+                                                    now(),
+                                                    now())`);
+        await connection.query("commit");
         return {
             isSuccess: true,
             result: result.rowCount === 1,
@@ -24,7 +23,7 @@ async function addProductCategory(productCategory) {
         };
     }
     catch (e) {
-        await connection.query(`rollback`);
+        await connection.query("rollback");
         throw {
             isSuccess: true,
             result: null,
@@ -36,19 +35,20 @@ exports.addProductCategory = addProductCategory;
 async function getProductCategories() {
     try {
         const connection = await new pg_1.Pool(posgre_1.PostgreSQLConfig);
-        let result = await connection.query(`select "ProductCategory".id,
+        await connection.query('update "Product" set active = false  where enddate < now()::timestamp;');
+        const result = await connection.query(`select "ProductCategory".id,
                                                     "ProductCategory".displayimage,
                                                     createat,
                                                     "ProductCategory".description,
                                                     "ProductCategory".name,
                                                     modifiedat,
                                                     (select count(P.id) filter ( where P.id is not null ) not_nulls) as count
-                                             from "ProductCategory"
+                                            from "ProductCategory"
                                                       left outer join "Product" P on "ProductCategory".id = P.categoryid
-                                             group by "ProductCategory".id, "ProductCategory".displayimage, createat,
+                                                      where "ProductCategory".active = true
+                                            group by "ProductCategory".id, "ProductCategory".displayimage, createat,
                                                       "ProductCategory".description, "ProductCategory".name, modifiedat
-                                             order by id`);
-        console.log(result.rows);
+                                            order by id`);
         result.rows.map(item => {
             item.createat = new Date(item.createat).toLocaleString("vi-VN", { timeZone: "Asia/Saigon" });
             item.modifiedat = new Date(item.modifiedat).toLocaleString("vi-VN", { timeZone: "Asia/Saigon" });
@@ -72,18 +72,18 @@ exports.getProductCategories = getProductCategories;
 async function updateProductCategory(oldId, productCategory) {
     const connection = await new pg_1.Pool(posgre_1.PostgreSQLConfig);
     try {
-        await connection.query(`begin`);
-        let result = await connection.query(`update "ProductCategory"
-                                             set name         = '${productCategory.name}',
-                                                 description  = '${productCategory.description}',
-                                                 displayImage = '${productCategory.displayImage}',
-                                                 modifiedAt   = now()
-                                             where id = ${oldId} `);
-        await connection.query(`commit`);
+        await connection.query("begin");
+        const result = await connection.query(`update "ProductCategory"
+                                            set name         = '${productCategory.name}',
+                                                description  = '${productCategory.description}',
+                                                displayImage = '${productCategory.displayImage}',
+                                                modifiedAt   = now()
+                                            where id = ${oldId} `);
+        await connection.query("commit");
         return (0, index_1.createResult)(result.rowCount === 1);
     }
     catch (e) {
-        await connection.query(`rollback`);
+        await connection.query("rollback");
         return (0, index_1.createException)(e);
     }
 }
@@ -91,17 +91,17 @@ exports.updateProductCategory = updateProductCategory;
 async function updateProductCategoryWithoutImage(oldId, productCategory) {
     const connection = await new pg_1.Pool(posgre_1.PostgreSQLConfig);
     try {
-        await connection.query(`begin`);
-        let result = await connection.query(`update "ProductCategory"
-                                             set name         = '${productCategory.name}',
-                                                 description  = '${productCategory.description}',
-                                                 modifiedAt   = now()
-                                             where id = ${oldId} `);
-        await connection.query(`commit`);
+        await connection.query("begin");
+        const result = await connection.query(`update "ProductCategory"
+                                            set name         = '${productCategory.name}',
+                                                description  = '${productCategory.description}',
+                                                modifiedAt   = now()
+                                            where id = ${oldId} `);
+        await connection.query("commit");
         return (0, index_1.createResult)(result.rowCount === 1);
     }
     catch (e) {
-        await connection.query(`rollback`);
+        await connection.query("rollback");
         return (0, index_1.createException)(e);
     }
 }
@@ -109,9 +109,9 @@ exports.updateProductCategoryWithoutImage = updateProductCategoryWithoutImage;
 async function getProductCategory(id) {
     try {
         const connection = await new pg_1.Pool(posgre_1.PostgreSQLConfig);
-        let result = await connection.query(`select *
-                                             from "ProductCategory"
-                                             where id = ${id}`);
+        const result = await connection.query(`select *
+                                            from "ProductCategory"
+                                            where id = ${id} and active = true`);
         if (result.rowCount === 1) {
             return (0, index_1.createResult)(result.rows[0]);
         }
@@ -127,11 +127,17 @@ exports.getProductCategory = getProductCategory;
 async function deleteProductCategory(id) {
     const connection = await new pg_1.Pool(posgre_1.PostgreSQLConfig);
     try {
-        await connection.query(`begin`);
-        const result = await connection.query(` delete
-                                                FROM "ProductCategory"
+        await connection.query("begin");
+        // const result = await connection.query(` delete
+        //                                         FROM "ProductCategory"
+        //                                         where id = ${id}  `)
+        const result = await connection.query(` update "ProductCategory"
+                                                set active = false
                                                 where id = ${id}  `);
-        await connection.query(`commit`);
+        await connection.query(` update "Product" 
+                                    set active = false 
+                                    where categoryid = ${id} `);
+        await connection.query("commit");
         return (0, index_1.createResult)(result.rowCount === 1);
     }
     catch (e) {

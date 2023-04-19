@@ -48,10 +48,11 @@ const DiscountRoute_1 = require("./routes/DiscountRoute");
 const OrderRoutes_1 = require("./routes/OrderRoutes");
 const UsersRoute_1 = require("./routes/UsersRoute");
 const InventoryRoute_1 = require("./routes/InventoryRoute");
+const morgan_1 = __importDefault(require("morgan"));
 exports.app = (0, express_1.default)();
 const credentials = {
-    key: fs.readFileSync('./key.pem'),
-    cert: fs.readFileSync('./cert.pem')
+    key: fs.readFileSync("./key.pem"),
+    cert: fs.readFileSync("./cert.pem")
 };
 dotenv_1.default.config({
     path: "process.env"
@@ -63,20 +64,20 @@ const upload = (0, multer_1.default)({
 const publicDirectoryPath = path_1.default.join(__dirname, "./public");
 exports.app.use(express_1.default.static(publicDirectoryPath));
 exports.app.use((0, cors_1.default)({
-    origin: '*'
+    origin: "*"
 }));
+exports.app.use((0, morgan_1.default)("combined"));
 // Setting the port
 const port = process.env.HTTP_PORT;
 // EJS setup
 exports.app.use(express_ejs_layouts_1.default);
 // Setting the root path for views directory
-exports.app.set('views', path_1.default.join(__dirname, 'views'));
+exports.app.set("views", path_1.default.join(__dirname, "views"));
 // Setting the view engine
-exports.app.set('view engine', 'ejs');
+exports.app.set("view engine", "ejs");
 /*Create application sessions */
 exports.app.use((0, express_session_1.default)({
-    // @ts-ignore
-    secret: process.env.SESSION_SECRET_KEY,
+    secret: process.env.SESSION_SECRET_KEY + "",
     saveUninitialized: true,
     cookie: { maxAge: 1000 * 60 * 60 * 24 },
     resave: true,
@@ -88,7 +89,7 @@ exports.app.use(request_ip_1.default.mw());
 exports.app.get("/empty", (req, res) => {
     res.render("empty_main");
 });
-var session;
+let session;
 /*Login route*/
 (0, routes_1.loginRoute)(exports.app);
 /* Home route */
@@ -117,7 +118,7 @@ var session;
 (0, InventoryRoute_1.inventoryRoute)(exports.app);
 /* 404 page */
 exports.app.use((req, res) => {
-    res.status(404).render('404');
+    res.status(404).render("404");
 });
 let client, _firebaseApp = firebase_conf_1.firebaseApp, _firebaseAdminApp = firebase_conf_1.firebaseAdminApp;
 async function handleDisconnect() {
@@ -127,7 +128,7 @@ async function handleDisconnect() {
     });
     console.log("Connected");
     client.end();
-    client.on('error', (error) => {
+    client.on("error", (error) => {
         console.log("Database error : ", error);
         if (error) {
             handleDisconnect();

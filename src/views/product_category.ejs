@@ -53,7 +53,7 @@
                 <div class="input-group mb-3 align-content-end justify-content-end" style="max-width: 25%">
                     <button data-bs-toggle="modal" data-bs-target="#addProductCategoryModal"
                             class="btn-primary p-2 rounded-3" style="background-color: #FFA500; border-color: #FFA500">
-                        Thêm  sản phẩm
+                        Thêm sản phẩm
                     </button>
                 </div>
                 <!-- Modal -->
@@ -171,14 +171,15 @@
                                          style="text-align: start">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title" id="exampleModalLabel">Xóa</h5>
+                                                <h5 class="modal-title" id="exampleModalLabel">Ngừng bán sản phẩm</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                         aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
-                                                <p>Xác nhận xoá thể loại <%= categories[i].name %></p>
-                                                <strong>Cảnh báo: Xoá loại sản phẩm sẽ xoá tất cả các sản phẩm thuộc
-                                                    loại sản phẩm đó, vẫn xoá?</strong>
+                                                <p>Xác nhận ngừng bán thể loại <%= categories[i].name %></p>
+                                                <strong>Cảnh báo: Ngừng bán loại sản phẩm sẽ ngừng bán tất cả các sản
+                                                    phẩm thuộc
+                                                    loại sản phẩm đó, vẫn ngừng bán?</strong>
                                             </div>
                                             <div class="modal-footer">
                                                 <form name="<%= "deleteCategoryForm" + categories[i].id %>"
@@ -196,7 +197,7 @@
                                                 <button type="submit" class="btn btn-primary"
                                                         form="<%= "deleteCategoryForm" + categories[i].id %>"
                                                         style="background-color: #FFA500; border-color: #FFA500"
-                                                >Xoá
+                                                >Xác nhận
                                                 </button>
                                             </div>
                                         </div>
@@ -237,7 +238,8 @@
                                                                required>
                                                     </div>
                                                     <div class="mb-3">
-                                                        <label for="formFile" class="form-label">Ảnh (bỏ trống nếu không đổi)</label>
+                                                        <label for="formFile" class="form-label">Ảnh (bỏ trống nếu không
+                                                            đổi)</label>
                                                         <input class="form-control" type="file" name="image"
                                                                accept="image/*"
                                                                id="formFile">
@@ -269,7 +271,7 @@
                                             style="border: transparent; background-color: transparent"
                                             data-bs-target="<%= "#deleteModal" + categories[i].id %>"
                                             data-bs-toggle="modal"
-                                    >Xóa
+                                    >Ngừng bán
                                     </button>
                                     <button class="link-primary"
                                             style="border: transparent; background-color: transparent"

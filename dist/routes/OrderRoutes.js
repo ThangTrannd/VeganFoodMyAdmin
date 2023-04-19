@@ -15,7 +15,6 @@ function orderRoutes(app) {
         const { paymentId, orderId, userId } = req.body;
         (0, PaymentDetails_1.updatePaymentDetailStatus)(paymentId, orderId, "Đang giao").then(r => {
             (0, User_1.getUserTokenDevice)(userId).then(r1 => {
-                console.log(r1);
                 (0, NotificationRoute_1.sendNotification)("Thông báo", "Đơn hàng của bạn đã được xác nhận", r1);
             });
             res.redirect("/pending-orders");

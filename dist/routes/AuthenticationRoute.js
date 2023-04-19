@@ -19,7 +19,7 @@ dotenv_1.default.config({
 });
 function loginRoute(app) {
     app.get("/login", (req, res) => {
-        if (req.session.userid !== 'admin') {
+        if (req.session.userid !== "admin") {
             res.render("login", { isError: false });
         }
         else {
@@ -64,7 +64,7 @@ function logoutRoute(app) {
 }
 exports.logoutRoute = logoutRoute;
 async function sendResetPasswordEmail(email) {
-    let _isEmailExist = await (0, User_1.isEmailHasTaken)(email);
+    const _isEmailExist = await (0, User_1.isEmailHasTaken)(email);
     if (!_isEmailExist) {
         return (0, postgre_1.createException)("Không tìm thấy email của bạn");
     }
@@ -80,11 +80,12 @@ async function sendResetPasswordEmail(email) {
     try {
         const accessToken = await oAuth2Client.getAccessToken();
         const transport = nodemailer_1.default.createTransport({
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            service: 'gmail',
+            service: "Gmail",
             auth: {
                 type: "OAuth2",
-                user: 'nongngocdieu20122002@gmail.com',
+                user: "nongngocdieu20122002@gmail.com",
                 clientId: CLIENT_ID,
                 clientSecret: CLIENT_SECRET,
                 refreshToken: REFRESH_TOKEN,
@@ -92,7 +93,7 @@ async function sendResetPasswordEmail(email) {
             }
         });
         const mailOption = {
-            from: "Support <support@tocotea.software>",
+            from: "Support <support@veganfood.pimob.me>",
             to: email,
             subject: "Đặt lại mật khẩu cho VeganFood",
             text: "Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn",
@@ -108,13 +109,12 @@ async function sendResetPasswordEmail(email) {
 exports.sendResetPasswordEmail = sendResetPasswordEmail;
 async function userResetPassword(email) {
     try {
-        let _isEmailExist = await (0, User_1.isEmailHasTaken)(email);
+        const _isEmailExist = await (0, User_1.isEmailHasTaken)(email);
         if (!_isEmailExist) {
             return (0, postgre_1.createException)("Không tìm thấy email của bạn");
         }
         const connection = await new pg_1.Pool(posgre_1.PostgreSQLConfig);
-        let id = await connection.query(`select id from "User" where email = '${email}'`);
-        console.log(id.rows[0].id);
+        const id = await connection.query(`select id from "User" where email = '${email}'`);
         await (0, ResetPassword_1.resetPassword)(id.rows[0].id);
         return (0, postgre_1.createResult)("");
     }

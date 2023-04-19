@@ -6,8 +6,7 @@ Object.defineProperty(exports, "homeRoute", { enumerable: true, get: function ()
 const AuthenticationRoute_1 = require("./AuthenticationRoute");
 Object.defineProperty(exports, "loginPostRoute", { enumerable: true, get: function () { return AuthenticationRoute_1.loginPostRoute; } });
 Object.defineProperty(exports, "loginRoute", { enumerable: true, get: function () { return AuthenticationRoute_1.loginRoute; } });
-const AuthenticationRoute_2 = require("./AuthenticationRoute");
-Object.defineProperty(exports, "logoutRoute", { enumerable: true, get: function () { return AuthenticationRoute_2.logoutRoute; } });
+Object.defineProperty(exports, "logoutRoute", { enumerable: true, get: function () { return AuthenticationRoute_1.logoutRoute; } });
 const AdminLoginLogRoute_1 = require("./AdminLoginLogRoute");
 Object.defineProperty(exports, "adminLoginLogRoute", { enumerable: true, get: function () { return AdminLoginLogRoute_1.adminLoginLogRoute; } });
 const ProductCategoryRoute_1 = require("./ProductCategoryRoute");

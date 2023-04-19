@@ -126,17 +126,19 @@
 
 
                         <!-- Delete Modal -->
-                        <div class="modal fade" id="deleteModal<%= orders[i].orderId %>" tabindex="-1" aria-labelledby="exampleModalLabel"
+                        <div class="modal fade" id="deleteModal<%= orders[i].orderId %>" tabindex="-1"
+                             aria-labelledby="exampleModalLabel"
                              aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLabel">Xóa đơn hàng số <%= orders[i].orderId %>?</h5>
+                                        <h5 class="modal-title" id="exampleModalLabel">Xóa đơn hàng
+                                            số <%= orders[i].orderId %>?</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                 aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                            Bạn chắc chắn muốn xóa order số <%= orders[i].orderId %>?
+                                        Bạn chắc chắn muốn xóa order số <%= orders[i].orderId %>?
                                         <form name="<%= "deleteOrder" + orders[i].orderId %>"
                                               enctype="application/x-www-form-urlencoded"
                                               id="<%= "deleteOrder" + orders[i].orderId %>"
@@ -156,7 +158,8 @@
                                         </button>
                                         <button type="submit" class="btn btn-primary"
                                                 form="<%= "deleteOrder" + orders[i].orderId %>"
-                                                style="background-color: #FFA500; border-color: #FFA500">Xóa</button>
+                                                style="background-color: #FFA500; border-color: #FFA500">Xóa
+                                        </button>
                                     </div>
                                 </div>
                             </div>

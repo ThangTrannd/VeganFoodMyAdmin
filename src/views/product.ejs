@@ -100,6 +100,11 @@
                                         <input aria-label="..." type="number" class="form-control" id="basic-url"
                                                aria-describedby="basic-addon3" name="quantity" required min="0">
                                     </div>
+                                    <label for="endDate" class="form-label">Hạn sử dụng</label>
+                                    <div class="input-group mb-3">
+                                        <input aria-label="..." type="date" class="form-control" id="basic-url"
+                                               aria-describedby="basic-addon3" name="endDate" required>
+                                    </div>
                                     <label for="price" class="form-label">Giá</label>
                                     <div class="input-group mb-3">
                                         <input aria-label="..." type="number" class="form-control" id="basic-url"
@@ -167,6 +172,7 @@
                         <th scope="col">Giá</th>
                         <th scope="row">Chuơng trình giảm giá</th>
                         <th scope="row">Size</th>
+                        <th scope="row">Hạn sử dụng</th>
                         <th scope="row">Hoạt động</th>
                     </tr>
                     </thead>
@@ -200,6 +206,9 @@
                             </td>
                             <td>
                                 <%= products[i].size %>
+                            </td>
+                            <td>
+                                <%= products[i].enddate %>
                             </td>
                             <td>
                                 <!-- Detail Modal -->
@@ -239,12 +248,12 @@
                                          style="text-align: start">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title" id="exampleModalLabel">Xóa</h5>
+                                                <h5 class="modal-title" id="exampleModalLabel">Ngừng bán</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                         aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
-                                                <p>Xác nhận xoá <%= products[i].productName %></p>
+                                                <p>Xác nhận ngừng bán <%= products[i].productName %></p>
                                             </div>
                                             <div class="modal-footer">
                                                 <form name="<%= "deleteProduct" + products[i].id %>"
@@ -262,7 +271,7 @@
                                                 <button type="submit" class="btn btn-primary"
                                                         form="<%= "deleteProduct" + products[i].id %>"
                                                         style="background-color: #FFA500; border-color: #FFA500"
-                                                >Xoá
+                                                >Ngừng bán
                                                 </button>
                                             </div>
                                         </div>
@@ -366,6 +375,16 @@
                                                                    for="<%= "btncheckLby" + products[i].id %>">L</label>
                                                         </div>
                                                     </div>
+                                                    <div class="input-group mb-3"
+                                                         style="display: flex; flex-direction: column">
+                                                        <label for="endDate" class="form-label">Hạn sử dụng</label>
+                                                        <div class="input-group mb-3">
+                                                            <input aria-label="..." type="date" class="form-control"
+                                                                   id="basic-url"
+                                                                   aria-describedby=" basic-addon3" name="endDate"
+                                                                   required>
+                                                        </div>
+                                                    </div>
                                                     <div class="mb-3">
                                                         <label for="formFile" class="form-label">Ảnh (bỏ trống nếu giữ
                                                             nguyên ảnh cũ)</label>
@@ -379,7 +398,7 @@
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                                     Huỷ
                                                 </button>
-                                                <button type="button" class="btn btn-primary"
+                                                <button type="submit" class="btn btn-primary"
                                                         onclick="((event)=> {
                                                                 let nameInput = document.getElementById(`product-name-update`)
                                                                 if (nameInput.value.length === 0) {
@@ -459,7 +478,7 @@
                                             style="border: transparent; background-color: transparent"
                                             data-bs-target="<%= "#deleteModal" + products[i].id %>"
                                             data-bs-toggle="modal"
-                                    >Xóa
+                                    >Ngừng bán
                                     </button>
                                     <button class="link-primary"
                                             style="border: transparent; background-color: transparent"

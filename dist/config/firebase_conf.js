@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.firebaseApp = exports.firebaseAdminApp = exports.firebaseConfig = void 0;
+// Import the functions you need from the SDKs you need
 const firebase_admin_1 = __importDefault(require("firebase-admin"));
 const app_1 = require("firebase/app");
 const datn_ltmt9_firebase_adminsdk_l7go0_8d735f1205_1 = require("./datn-ltmt9-firebase-adminsdk-l7go0-8d735f1205");

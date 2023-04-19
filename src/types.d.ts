@@ -23,6 +23,8 @@ declare type Product = {
     productCategoryName: string | null,
     productCategoryId: number,
     quantity: number,
+
+    endDate: string,
     price: number,
     discount: string | null,
     discountId: number | null

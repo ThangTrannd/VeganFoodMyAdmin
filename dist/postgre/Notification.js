@@ -7,9 +7,9 @@ const index_1 = require("./index");
 async function getAllNotifications() {
     try {
         const connection = await new pg_1.Pool(posgre_1.PostgreSQLConfig);
-        let result = await connection.query(`select *
-                                             from "Notifications"
-                                             order by id`);
+        const result = await connection.query(`select *
+                                          from "Notifications"
+                                          order by id`);
         return (0, index_1.createResult)(result.rows);
     }
     catch (e) {
@@ -20,9 +20,9 @@ exports.getAllNotifications = getAllNotifications;
 async function getPromotionNotifications() {
     try {
         const connection = await new pg_1.Pool(posgre_1.PostgreSQLConfig);
-        let result = await connection.query(`select *
-                                             from "Notifications"
-                                             where type = 'Khuyến mại'`);
+        const result = await connection.query(`select *
+                                          from "Notifications"
+                                          where type = 'Khuyến mại'`);
         return (0, index_1.createResult)(result.rows);
     }
     catch (e) {
@@ -33,9 +33,9 @@ exports.getPromotionNotifications = getPromotionNotifications;
 async function getNewsNotifications() {
     try {
         const connection = await new pg_1.Pool(posgre_1.PostgreSQLConfig);
-        let result = await connection.query(`select *
-                                             from "Notifications"
-                                             where type = 'Tin tức'`);
+        const result = await connection.query(`select *
+                                          from "Notifications"
+                                          where type = 'Tin tức'`);
         return (0, index_1.createResult)(result.rows);
     }
     catch (e) {
@@ -46,18 +46,18 @@ exports.getNewsNotifications = getNewsNotifications;
 async function addNotification(title, message, type, image) {
     const connection = await new pg_1.Pool(posgre_1.PostgreSQLConfig);
     try {
-        await connection.query(`begin`);
-        let result = await connection.query(`insert into "Notifications" (id, title, message, type, image)
-                                             VALUES (default,
-                                                     '${title}',
-                                                     '${message}',
-                                                     '${type}',
-                                                     '${image}')`);
-        await connection.query(`commit`);
+        await connection.query("begin");
+        const result = await connection.query(`insert into "Notifications" (id, title, message, type, image)
+                                          VALUES (default,
+                                          '${title}',
+                                          '${message}',
+                                          '${type}',
+                                          '${image}')`);
+        await connection.query("commit");
         return (0, index_1.createResult)(result.rowCount != 0);
     }
     catch (e) {
-        await connection.query(`rollback`);
+        await connection.query("rollback");
         return (0, index_1.createException)(e);
     }
 }
@@ -65,14 +65,14 @@ exports.addNotification = addNotification;
 async function deleteNotification(id) {
     const connection = await new pg_1.Pool(posgre_1.PostgreSQLConfig);
     try {
-        await connection.query(`begin`);
+        await connection.query("begin");
         await connection.query(`delete
                             from "Notifications"
                             where id = ${id}`);
-        await connection.query(`commit`);
+        await connection.query("commit");
     }
     catch (e) {
-        await connection.query(`rollback`);
+        await connection.query("rollback");
     }
 }
 exports.deleteNotification = deleteNotification;

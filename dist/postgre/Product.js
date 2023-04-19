@@ -7,23 +7,24 @@ const index_1 = require("./index");
 async function addProduct(product) {
     const connection = await new pg_1.Pool(posgre_1.PostgreSQLConfig);
     try {
-        await connection.query(`begin`);
+        await connection.query("begin");
         const result = await connection.query(`insert into "Product"
-                                               values (default,
-                                                       '${product.productName}',
-                                                       '${product.productCategoryId}',
-                                                       '${product.quantity}',
-                                                       '${product.price}',
-                                                       ${product.discountId},
-                                                       '${product.displayImage}',
-                                                       '${product.size}',
-                                                       true,
-                                                       '${product.productDescription}')`);
-        await connection.query(`commit`);
+                                              values (default,
+                                                      '${product.productName}',
+                                                      '${product.productCategoryId}',
+                                                      '${product.quantity}',
+                                                      '${product.price}',
+                                                      ${product.discountId},
+                                                      '${product.displayImage}',
+                                                      '${product.size}',
+                                                      true,
+                                                      '${product.productDescription}',
+                                                       '${product.endDate}')`);
+        await connection.query("commit");
         return (0, index_1.createResult)(true);
     }
     catch (e) {
-        await connection.query(`rollback`);
+        await connection.query("rollback");
         throw (0, index_1.createException)(e);
     }
 }
@@ -31,15 +32,15 @@ exports.addProduct = addProduct;
 async function deleteProduct(id) {
     const connection = await new pg_1.Pool(posgre_1.PostgreSQLConfig);
     try {
-        await connection.query(`begin`);
+        await connection.query("begin");
         const result = await connection.query(`update "Product"
-                                               set active = false
-                                               where id = ${id}`);
-        await connection.query(`commit`);
+                                              set active = false
+                                              where id = ${id}`);
+        await connection.query("commit");
         return (0, index_1.createResult)(true);
     }
     catch (e) {
-        await connection.query(`rollback`);
+        await connection.query("rollback");
         return (0, index_1.createException)(e);
     }
 }
@@ -52,8 +53,8 @@ async function updateProductQuantity(id, quantity) {
     try {
         const connection = await new pg_1.Pool(posgre_1.PostgreSQLConfig);
         const result = await connection.query(`update "Product"
-                                               set quantity = ${quantity}
-                                               where id = ${id}`);
+                                              set quantity = ${quantity}
+                                              where id = ${id}`);
         if (result.rowCount === 1) {
             return (0, index_1.createResult)(result.rowCount === 1);
         }
@@ -81,14 +82,16 @@ async function getProducts() {
                                                       round(("Discount".discountpercent * "Product".price) /
                                                             100)                 as "priceAfterDiscount",
                                                       "Product".size             as "size",
+                                                      to_char("Product".enddate,'dd-MM-yyyy')             as "enddate",
                                                       "Product".displayimage     as "displayImage"
 
-                                               from "Product"
-                                                        inner join "ProductCategory" on "ProductCategory".id = "Product".categoryid
-                                                        left join "Discount" on "Product".discountid = "Discount".id
-                                               where "Product".active = true
-                                               order by id;
+                                              from "Product"
+                                                  inner join "ProductCategory" on "ProductCategory".id = "Product".categoryid
+                                                  left join "Discount" on "Product".discountid = "Discount".id
+                                              where "Product".active = true
+                                              order by id;
         `);
+        await connection.query('update "Product" set active = false  where enddate < now()::timestamp;');
         result.rows.map(item => {
             item.size = item.size.toString().split(",").filter((it) => {
                 return it != "";
@@ -121,11 +124,11 @@ async function getProduct(productId) {
                                                             100)                 as "priceAfterDiscount",
                                                       "Product".size             as "size",
                                                       "Product".displayimage as "displayImage"
-                                               from "Product"
+                                              from "Product"
                                                         inner join "ProductCategory" on "ProductCategory".id = "Product".categoryid
                                                         left join "Discount" on "Product".discountid = "Discount".id
-                                               where "Product".active = true
-                                                 and "Product".id = ${productId}`);
+                                              where "Product".active = true
+                                                and "Product".id = ${productId}`);
         if (result.rows.length === 1) {
             return (0, index_1.createResult)(result.rows[0]);
         }
@@ -139,45 +142,47 @@ async function getProduct(productId) {
 }
 exports.getProduct = getProduct;
 async function updateProduct(product, productId) {
+    console.log(product);
     const connection = await new pg_1.Pool(posgre_1.PostgreSQLConfig);
     try {
-        await connection.query(`begin`);
+        await connection.query("begin");
         const result = await connection.query(`update "Product"
-                                               set name        = '${product.productName}',
-                                                   description = '${product.productDescription}',
-                                                   categoryid  = ${product.productCategoryId},
-                                                   quantity    = ${product.quantity},
-                                                   price       = ${product.price},
-                                                   displayimage= '${product.displayImage}',
-                                                   size        = '${product.size}'
-                                               where id = ${productId}`);
-        await connection.query(`commit`);
+                                              set name        = '${product.productName}',
+                                                  description = '${product.productDescription}',
+                                                  categoryid  = ${product.productCategoryId},
+                                                  quantity    = ${product.quantity},
+                                                  price       = ${product.price},
+                                                  displayimage= '${product.displayImage}',
+                                                  size        = '${product.size}',
+                                                  enddate     = '${product.endDate}'
+                                              where id = ${productId}`);
+        await connection.query("commit");
         return (0, index_1.createResult)(result.rowCount === 1);
     }
     catch (e) {
-        await connection.query(`rollback`);
+        await connection.query("rollback");
         return (0, index_1.createException)(e);
     }
 }
 exports.updateProduct = updateProduct;
 async function updateProductWithoutImage(product, productId) {
     const connection = await new pg_1.Pool(posgre_1.PostgreSQLConfig);
-    console.log(product.size);
     try {
-        await connection.query(`begin`);
+        await connection.query("begin");
         const result = await connection.query(`update "Product"
-                                               set name        = '${product.productName}',
-                                                   description = '${product.productDescription}',
-                                                   categoryid  = ${product.productCategoryId},
-                                                   quantity    = ${product.quantity},
-                                                   price       = ${product.price},
-                                                   size        = '${product.size}'
-                                               where id = ${productId}`);
-        await connection.query(`commit`);
+                                              set name        = '${product.productName}',
+                                                  description = '${product.productDescription}',
+                                                  categoryid  = ${product.productCategoryId},
+                                                  quantity    = ${product.quantity},
+                                                  price       = ${product.price},
+                                                  size        = '${product.size}',
+                                                  enddate     = '${product.endDate}'
+                                              where id = ${productId}`);
+        await connection.query("commit");
         return (0, index_1.createResult)(result.rowCount == 1);
     }
     catch (e) {
-        await connection.query(`rollback`);
+        await connection.query("rollback");
         throw (0, index_1.createException)(e);
     }
 }
@@ -199,12 +204,12 @@ async function getProductsByCategoryId(categoryId) {
                                                       "Product".size             as "size",
                                                       "Product".displayimage     as "displayImage"
 
-                                               from "Product"
+                                              from "Product"
                                                         inner join "ProductCategory" on "ProductCategory".id = "Product".categoryid
                                                         left join "Discount" on "Product".discountid = "Discount".id
-                                               where "Product".active = true
-                                                 and "ProductCategory".id = ${categoryId}
-                                               order by id;
+                                              where "Product".active = true
+                                                and "ProductCategory".id = ${categoryId}
+                                              order by id;
         `);
         result.rows.map(item => {
             item.size = item.size.toString().split(",").filter((it) => {
@@ -226,9 +231,9 @@ exports.getProductsByCategoryId = getProductsByCategoryId;
 async function applyDiscount(productId, discountId) {
     try {
         const connection = await new pg_1.Pool(posgre_1.PostgreSQLConfig);
-        let result = await connection.query(`update "Product"
-                                             set discountid = ${discountId}
-                                             where id = ${productId}`);
+        const result = await connection.query(`update "Product"
+                                            set discountid = ${discountId}
+                                            where id = ${productId}`);
         return (0, index_1.createResult)(result.rowCount == 1);
     }
     catch (e) {
@@ -252,10 +257,10 @@ async function findProductsByName(query) {
                                                             100)                 as "priceAfterDiscount",
                                                       "Product".size             as "size",
                                                       "Product".displayimage     as "displayImage"
-                                               from "Product"
+                                              from "Product"
                                                         inner join "ProductCategory" on "ProductCategory".id = "Product".categoryid
                                                         left join "Discount" on "Product".discountid = "Discount".id
-                                               where upper("Product".name) like upper('%${query}%')
+                                              where upper("Product".name) like upper('%${query}%')
         `);
         result.rows.map(item => {
             item.size = item.size.toString().split(",").filter((it) => {

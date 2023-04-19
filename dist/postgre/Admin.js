@@ -6,10 +6,10 @@ const pg_1 = require("pg");
 const index_1 = require("./index");
 async function isAdminLogin(username, password, ip) {
     const connection = new pg_1.Pool(posgre_1.PostgreSQLConfig);
-    let result = await connection.query(`select *
-                                         from "Admin"
-                                         where username = '${username}'
-                                           and password = '${password}' `);
+    const result = await connection.query(`select *
+                                        from "Admin"
+                                        where username = '${username}'
+                                        and password = '${password}' `);
     await connection.query(`INSERT INTO "AdminLoginLog"
                             values (default, now(), '${ip}')`);
     if (result.rowCount == 1) {
@@ -22,21 +22,20 @@ exports.isAdminLogin = isAdminLogin;
 async function updateAdminLastLogin() {
     const connection = await new pg_1.Pool(posgre_1.PostgreSQLConfig);
     try {
-        await connection.query(`begin`);
-        let result = await connection.query(`update "Admin"
-                                             set lastLogin = now()
-                                             where username = 'admin'
-                                               and password = 'admin'`);
-        await connection.query(`commit`);
+        await connection.query("begin");
+        const result = await connection.query(`update "Admin" set lastLogin = now()
+                                          where username = 'admin'
+                                          and password = 'admin'`);
+        await connection.query("commit");
     }
     catch (e) {
-        await connection.query(`rollback`);
+        await connection.query("rollback");
     }
 }
 exports.updateAdminLastLogin = updateAdminLastLogin;
 async function getLog() {
     const connection = await new pg_1.Pool(posgre_1.PostgreSQLConfig);
-    let result = await connection.query('select * from "AdminLoginLog"');
+    const result = await connection.query("select * from \"AdminLoginLog\"");
     return (0, index_1.createResult)(result.rows);
 }
 exports.getLog = getLog;
