@@ -187,7 +187,7 @@
                                         <div style="flex: 1; text-align: center ; margin-top: 16px;"></div>
                                         <div style="flex: 1; text-align: center; margin-top: 16px"></div>
                                         <div style="flex: 1; text-align: center; margin-top: 16px;">Tổng:</div>
-                                        <div style="flex: 1; text-align: center; margin-top: 16px;"><%= orders[i].total %></div>
+                                        <div style="flex: 1; text-align: center; margin-top: 16px;"><%= orders[i].total || 0 %></div>
                                     </div>
                                 </div>
                             </div>
@@ -224,129 +224,129 @@
 <script src="/assets/charts/yearly-chart.js" type="module"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.1.1/dist/chart.umd.min.js"></script>
 <script>
-  document.getElementById('startDate').valueAsDate = new Date();
-  document.getElementById('endDate').valueAsDate = new Date();
-  const context = document.getElementById("chart")
-  let chart;
+    document.getElementById('startDate').valueAsDate = new Date();
+    document.getElementById('endDate').valueAsDate = new Date();
+    const context = document.getElementById("chart")
+    let chart;
 
-  function filterData() {
-    fetch("/api/statistical/bar-chart").then(fetchedData => {
-      document.getElementById("startDate").style.pointerEvents = "none"
-      document.getElementById("endDate").style.pointerEvents = "none"
-      return fetchedData.json()
-    }).then(fetchedData => {
-      {
+    function filterData() {
+        fetch("/api/statistical/bar-chart").then(fetchedData => {
+            document.getElementById("startDate").style.pointerEvents = "none"
+            document.getElementById("endDate").style.pointerEvents = "none"
+            return fetchedData.json()
+        }).then(fetchedData => {
+            {
 
-        context.style.visibility = "hidden"
-        let labels = fetchedData.labels
-        const data = fetchedData.data
-        const startDate = new Date(document.getElementById("startDate").value).setHours(0, 0, 0, 0)
-        const endDate = new Date(document.getElementById("endDate").value).setHours(0, 0, 0, 0)
-        const colors = []
-        for (let i = 0; i < labels.length; i++) {
-          const r = Math.floor(Math.random() * 255);
-          const g = Math.floor(Math.random() * 255);
-          const b = Math.floor(Math.random() * 255);
-          colors.push('rgba(' + r + "," + g + "," + b + ", 0.2)")
-        }
-        labels = labels.map(item => {
-          item = item.toString().split("-")
-          return new Date(item[1] + "/" + item[0] + "/" + item[2]).setHours(0, 0, 0, 0)
-        })
-        console.log(labels)
-        let filteredLabels = labels.filter(item => (item >= startDate && item <= endDate))
-        console.log(filteredLabels)
+                context.style.visibility = "hidden"
+                let labels = fetchedData.labels
+                const data = fetchedData.data
+                const startDate = new Date(document.getElementById("startDate").value).setHours(0, 0, 0, 0)
+                const endDate = new Date(document.getElementById("endDate").value).setHours(0, 0, 0, 0)
+                const colors = []
+                for (let i = 0; i < labels.length; i++) {
+                    const r = Math.floor(Math.random() * 255);
+                    const g = Math.floor(Math.random() * 255);
+                    const b = Math.floor(Math.random() * 255);
+                    colors.push('rgba(' + r + "," + g + "," + b + ", 0.2)")
+                }
+                labels = labels.map(item => {
+                    item = item.toString().split("-")
+                    return new Date(item[1] + "/" + item[0] + "/" + item[2]).setHours(0, 0, 0, 0)
+                })
+                console.log(labels)
+                let filteredLabels = labels.filter(item => (item >= startDate && item <= endDate))
+                console.log(filteredLabels)
 
-        const startArray = labels.indexOf(filteredLabels[0])
-        const endArray = labels.indexOf(filteredLabels[filteredLabels.length - 1])
+                const startArray = labels.indexOf(filteredLabels[0])
+                const endArray = labels.indexOf(filteredLabels[filteredLabels.length - 1])
 
-        const filteredData = [...data]
-        filteredData.splice(endArray + 1, filteredLabels.length)
-        filteredData.splice(0, startArray)
-        console.log(filteredData)
-        filteredLabels = filteredLabels.map(item => {
-          console.log(item)
-          console.log(new Date(item))
-          return new Date(item).toLocaleDateString("vi-VN")
-        })
-        chart.config = {
-          type: 'bar',
-          data: {
-            labels: filteredLabels,
-            datasets: [{
-              label: 'Thu nhập',
-              data: filteredData,
-              backgroundColor: colors,
-              borderWidth: 1
-            }]
-          },
-          options: {
-            scales: {
-              y: {
-                beginAtZero: true
-              }
+                const filteredData = [...data]
+                filteredData.splice(endArray + 1, filteredLabels.length)
+                filteredData.splice(0, startArray)
+                console.log(filteredData)
+                filteredLabels = filteredLabels.map(item => {
+                    console.log(item)
+                    console.log(new Date(item))
+                    return new Date(item).toLocaleDateString("vi-VN")
+                })
+                chart.config = {
+                    type: 'bar',
+                    data: {
+                        labels: filteredLabels,
+                        datasets: [{
+                            label: 'Thu nhập',
+                            data: filteredData,
+                            backgroundColor: colors,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                }
+                context.style.visibility = "visible"
+                chart.update()
+                document.getElementById("startDate").style.pointerEvents = "all"
+                document.getElementById("endDate").style.pointerEvents = "all"
             }
-          }
-        }
-        context.style.visibility = "visible"
-        chart.update()
-        document.getElementById("startDate").style.pointerEvents = "all"
-        document.getElementById("endDate").style.pointerEvents = "all"
-      }
-    })
-  }
-
-
-  fetch("/api/statistical/bar-chart").then(fetchedData => fetchedData.json()).then(fetchedData => {
-    {
-      const context = document.getElementById("chart")
-      const labels = fetchedData.labels
-      const data = fetchedData.data
-      const colors = []
-      for (let i = 0; i < labels.length; i++) {
-        const r = Math.floor(Math.random() * 255);
-        const g = Math.floor(Math.random() * 255);
-        const b = Math.floor(Math.random() * 255);
-        colors.push('rgba(' + r + "," + g + "," + b + ", 0.2)")
-      }
-      let config = {
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Thu nhập',
-            data: data,
-            backgroundColor: colors,
-            borderWidth: 1
-          }]
-        },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
-      }
-      chart = new Chart(context, config)
-      Chart.plugins.register({
-        afterDraw: function (chart) {
-          if (chart.data.labels.length === 0) {
-            let ctx = chart.chart.ctx;
-            let width = chart.chart.width;
-            let height = chart.chart.height;
-
-            chart.clear();
-            ctx.save();
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('Có vẻ như ngày nhập vào không hợp lệ hoặc không có dữ liệu để hiển thị!', width / 2, height / 2);
-            ctx.restore();
-          }
-        }
-      });
-      chart.update()
+        })
     }
-  })
+
+
+    fetch("/api/statistical/bar-chart").then(fetchedData => fetchedData.json()).then(fetchedData => {
+        {
+            const context = document.getElementById("chart")
+            const labels = fetchedData.labels
+            const data = fetchedData.data
+            const colors = []
+            for (let i = 0; i < labels.length; i++) {
+                const r = Math.floor(Math.random() * 255);
+                const g = Math.floor(Math.random() * 255);
+                const b = Math.floor(Math.random() * 255);
+                colors.push('rgba(' + r + "," + g + "," + b + ", 0.2)")
+            }
+            let config = {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Thu nhập',
+                        data: data,
+                        backgroundColor: colors,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            }
+            chart = new Chart(context, config)
+            Chart.plugins.register({
+                afterDraw: function (chart) {
+                    if (chart.data.labels.length === 0) {
+                        let ctx = chart.chart.ctx;
+                        let width = chart.chart.width;
+                        let height = chart.chart.height;
+
+                        chart.clear();
+                        ctx.save();
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('Có vẻ như ngày nhập vào không hợp lệ hoặc không có dữ liệu để hiển thị!', width / 2, height / 2);
+                        ctx.restore();
+                    }
+                }
+            });
+            chart.update()
+        }
+    })
 
 </script>

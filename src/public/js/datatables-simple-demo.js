@@ -1,6 +1,29 @@
 window.addEventListener('DOMContentLoaded', event => {
     // Simple-DataTables
     // https://github.com/fiduswriter/Simple-DataTables/wiki
+    $(document).ready(function () {
+        $('#tableProducts').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                'copyHtml5',
+                'excelHtml5',
+                'csvHtml5',
+                'pdfHtml5'
+            ]
+        });
+    });
+
+    $(document).ready(function () {
+        $('#tableProductsCategory').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                'copyHtml5',
+                'excelHtml5',
+                'csvHtml5',
+                'pdfHtml5'
+            ]
+        });
+    });
 
     $(document).ready(function () {
         $('#datatablesSimple').DataTable({
@@ -104,4 +127,5 @@ window.addEventListener('DOMContentLoaded', event => {
             ]
         });
     });
+
 });

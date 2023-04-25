@@ -11,6 +11,8 @@ async function getAllStatistical() {
         const queryResult = await connection.query(`select *
                                                     from "OrderDetail"
                                                             inner join "PaymentDetails" PD on PD.id = "OrderDetail".paymentid`);
+        const test = await connection.query(`select PD."status", count(PD."status") from "OrderDetail"inner join "PaymentDetails" PD on PD.id = "OrderDetail".paymentid group by (PD."status")`);
+        console.log(test);
         const result = {
             total: queryResult.rows.length,
             pending: 0,

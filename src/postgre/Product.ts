@@ -117,6 +117,7 @@ export async function getProduct(productId: number): Promise<APIResponse<Product
                                                       round((coalesce("Discount".discountpercent, 0) * "Product".price) /
                                                             100)                 as "priceAfterDiscount",
                                                       "Product".size             as "size",
+                                                      to_char("Product".enddate,'dd-MM-yyyy') as "enddate",      
                                                       "Product".displayimage as "displayImage"
                                               from "Product"
                                                         inner join "ProductCategory" on "ProductCategory".id = "Product".categoryid
@@ -151,6 +152,22 @@ export async function updateProduct(product: Product, productId: number): Promis
                                                   enddate     = '${product.endDate}'
                                               where id = ${productId}`
         );
+        await connection.query("commit");
+        return createResult(result.rowCount === 1);
+    } catch (e) {
+        await connection.query("rollback");
+        return createException(e);
+    }
+}
+
+export async function updateQuantityProduct(orderId: number, calculate: string): Promise<APIResponse<boolean>> {
+    const connection = await new Pool(PostgreSQLConfig);
+    try {
+        await connection.query("begin");
+        const result = await connection.query(`select p.id as productId , oi.quantity from "Product" as p left join "OrderItem" as oi on oi.productid = p.id where oi.oderid =${orderId}`);
+        for (const row of result.rows) {
+            await connection.query(`update "Product" as p set quantity = p.quantity ${calculate} ${row.quantity} where p.id = '${row.productid}'`);
+        }
         await connection.query("commit");
         return createResult(result.rowCount === 1);
     } catch (e) {
@@ -233,27 +250,35 @@ export async function applyDiscount(productId: number, discountId: number): Prom
     }
 }
 
-export async function findProductsByName(query: string): Promise<APIResponse<Product[]>> {
+export async function findProductsByName(query?: string, year?: number, month?: number, day?: number, categoryId?: number, priceFrom?: bigint, priceTo?: bigint): Promise<APIResponse<Product[]>> {
     try {
         const connection = await new Pool(PostgreSQLConfig);
-        const result = await connection.query(`select "Product".id,
-                                                      "Product".name             as "productName",
-                                                      "Product".description      as "productDescription",
-                                                      "ProductCategory".name     as "productCategoryName",
-                                                      "Product".quantity         as "quantity",
-                                                      "Product".price            as "price",
-                                                      "Discount".name            as "discount",
-                                                      "Discount".discountpercent as "discountPercent",
-                                                      "Product".price -
-                                                      round(("Discount".discountpercent * "Product".price) /
-                                                            100)                 as "priceAfterDiscount",
-                                                      "Product".size             as "size",
-                                                      "Product".displayimage     as "displayImage"
-                                              from "Product"
-                                                        inner join "ProductCategory" on "ProductCategory".id = "Product".categoryid
-                                                        left join "Discount" on "Product".discountid = "Discount".id
-                                              where upper("Product".name) like upper('%${query}%')
-        `);
+        const queryString = `select "Product".id,
+                                    "Product".name             as "productName",
+                                    "Product".description      as "productDescription",
+                                    "ProductCategory".name     as "productCategoryName",
+                                    "Product".quantity         as "quantity",
+                                    "Product".price            as "price",
+                                    "Discount".name            as "discount",
+                                    "Discount".discountpercent as "discountPercent",
+                                    "Product".price - round(("Discount".discountpercent * "Product".price) / 100) as "priceAfterDiscount",
+                                    "Product".size             as "size",
+                                    "Product".displayimage     as "displayImage",
+                                    "Product".enddate as "endDate"
+                                from "Product"
+                                    inner join "ProductCategory" on "ProductCategory".id = "Product".categoryid
+                                    left join "Discount" on "Product".discountid = "Discount".id
+                                where "Product".active = true 
+                                ${query ? `and upper("Product".name) like upper('%${query}%')` : ''}
+                                ${priceFrom ? `and "Product".price >= ${priceFrom}` : ''}
+                                ${priceTo ? `and "Product".price <= ${priceTo}` : ''}
+                                ${categoryId ? `and "ProductCategory".id = ${categoryId}` : ''}
+                                ${year ? `and DATE_PART('Year', "Product".enddate) = ${year}` : ''}
+                                ${month ? `and DATE_PART('month', "Product".enddate) = ${month}` : ''}
+                                ${day ? `and DATE_PART('day', "Product".enddate) = ${day}` : ''}
+                                `
+        console.log(queryString)
+        const result = await connection.query(queryString);
         result.rows.map(item => {
             item.size = item.size.toString().split(",").filter((it: string) => {
                 return it != "";

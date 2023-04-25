@@ -5,6 +5,7 @@ const OrderDetails_1 = require("../postgre/OrderDetails");
 const PaymentDetails_1 = require("../postgre/PaymentDetails");
 const User_1 = require("../postgre/User");
 const NotificationRoute_1 = require("./NotificationRoute");
+const Product_1 = require("../postgre/Product");
 function orderRoutes(app) {
     app.get("/pending-orders", (req, res) => {
         (0, OrderDetails_1.getOrders)("Đợi xác nhận").then(r => {
@@ -22,7 +23,8 @@ function orderRoutes(app) {
     });
     app.post("/pending-orders/cancel", (req, res) => {
         const { paymentId, orderId, userId } = req.body;
-        (0, PaymentDetails_1.updatePaymentDetailStatus)(paymentId, orderId, "Bị hủy").then(r => {
+        (0, PaymentDetails_1.updatePaymentDetailStatus)(paymentId, orderId, "Bị hủy").then(async (r) => {
+            await (0, Product_1.updateQuantityProduct)(orderId, '+');
             (0, User_1.getUserTokenDevice)(userId).then(r1 => {
                 (0, NotificationRoute_1.sendNotification)("Thông báo", "Đơn hàng của bạn đã bị hủy", r1);
             });

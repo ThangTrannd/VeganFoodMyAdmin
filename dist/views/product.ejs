@@ -7,6 +7,9 @@
     <meta name="description" content=""/>
     <meta name="author" content=""/>
     <title>VeganFood Admin</title>
+    <link href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet"/>
     <link href="/css/styles.css" rel="stylesheet"/>
     <style>
@@ -160,20 +163,20 @@
             </div>
             <!-- Main view -->
             <div>
-                <table class="table">
+                <table id="tableProducts" class="table cell-border">
                     <thead>
                     <tr>
-                        <th scope="col">ID</th>
-                        <th scope="col">Ảnh</th>
-                        <th scope="col">Tên</th>
-                        <th scope="col">Mô tả</th>
-                        <th scope="col">Loại sản phẩm</th>
-                        <th scope="col">Số luợng</th>
-                        <th scope="col">Giá</th>
-                        <th scope="row">Chuơng trình giảm giá</th>
-                        <th scope="row">Size</th>
-                        <th scope="row">Hạn sử dụng</th>
-                        <th scope="row">Hoạt động</th>
+                        <th>ID</th>
+                        <th>Ảnh</th>
+                        <th>Tên</th>
+                        <th>Mô tả</th>
+                        <th>Loại sản phẩm</th>
+                        <th>Số luợng</th>
+                        <th>Giá</th>
+                        <th>Chuơng trình giảm giá</th>
+                        <th>Size</th>
+                        <th>Hạn sử dụng</th>
+                        <th>Hoạt động</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -228,14 +231,16 @@
                                                 <span><strong>Mô tả: </strong><%= products[i].productDescription %></span>
                                                 <span><strong>Loại sản phẩm: </strong><%= products[i].productCategoryName %></span>
                                                 <span><strong>Số luợng: </strong><%= products[i].quantity %></span>
+                                                <span><strong>Hạn sử dụng: </strong><%= products[i].enddate %></span>
                                                 <span><strong>Giá: </strong><%= products[i].price %></span>
                                                 <span><strong>Chuơng trình giảm giá: </strong><%= products[i].discount %></span>
                                                 <span><strong>Size: </strong><%= products[i].size %></span>
 
                                                 <span style="display: flex; flex-direction: row;align-content: center; justify-content: center"><strong
                                                             style="text-align: center">Ảnh</strong></span>
-                                                <span><img src="<%= products[i].displayImage %>"
-                                                           style="width: 1080px; height: 1920px; object-fit: contain"></span>
+                                                <span style="text-align: center"><img
+                                                            src="<%= products[i].displayImage %>"
+                                                            style="object-fit: contain"></span>
                                             </div>
                                         </div>
                                     </div>
@@ -512,8 +517,6 @@
         crossorigin="anonymous"></script>
 <script src="/js/scripts.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
-<script src="/assets/demo/chart-area-demo.js"></script>
-<script src="/assets/demo/chart-bar-demo.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>
 <script src="/js/datatables-simple-demo.js"></script>
 </body>

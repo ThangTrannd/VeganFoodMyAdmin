@@ -557,7 +557,7 @@ function API(app) {
         });
     });
     app.post("/api/product/find", (req, res) => {
-        (0, Product_1.findProductsByName)(req.body.query).then(r => {
+        (0, Product_1.findProductsByName)(req.body.query, req.body.year, req.body.month, req.body.day, req.body.categoryId, req.body.priceFrom, req.body.priceTo).then(r => {
             res.json(r);
         }).catch(e => {
             res.end(e);

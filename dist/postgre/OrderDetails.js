@@ -7,6 +7,7 @@ const index_1 = require("./index");
 const PaymentDetails_1 = require("./PaymentDetails");
 const OrderItem_1 = require("./OrderItem");
 const ShoppingSession_1 = require("./ShoppingSession");
+const Product_1 = require("./Product");
 /* Move temporary cart to order details, cuz ppl confirmed buying */
 async function confirmOrder(userId, sessionId, provider, phoneNumber, address, note) {
     try {
@@ -25,6 +26,7 @@ async function confirmOrder(userId, sessionId, provider, phoneNumber, address, n
         const orderId = await createOrder(userId, sessionId, provider, phoneNumber, address, note);
         await (0, index_1.deleteShoppingSession)(userId, sessionId);
         await updateProductInventory(orderId, userId);
+        await (0, Product_1.updateQuantityProduct)(orderId, '-');
         return (0, index_1.createResult)(true);
     }
     catch (e) {
@@ -498,10 +500,13 @@ async function userCancelOrder(userId, orderId) {
                                           where id = ${paymentId}
                                           and orderid = ${orderId}
                                           and status like 'Đợi xác nhận'`);
+        await (0, Product_1.updateQuantityProduct)(orderId, '+');
         await connection.query("commit");
         if (result.rowCount != 1) {
             return (0, index_1.createException)("Bạn không thể hủy đơn này!");
         }
+        const order = await connection.query(`select productid , quantity  from "OrderItem" oi where oderid = ${orderId}`);
+        console.log(order);
         return (0, index_1.createResult)("Hủy thành công!");
     }
     catch (e) {

@@ -1,0 +1,23 @@
+image: alpine:latest
+before_script:
+  - apk add openssh-client
+  - apk add sshpass
+stages:
+  - deploy
+deploy:
+  stage: deploy
+  only:
+    - main
+  before_script:
+    # Setup SSH deploy keys
+    - 'which ssh-agent || ( apk add openssh-client )'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | ssh-add -
+    - mkdir -p ~/.ssh
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  script:
+    - echo "Deploying ..."
+    - echo $SSH_KEY
+    - ssh ubuntu@$ip -p 22 "pm2 stop 0 && ls &&  cd /home/ubuntu/WebDATN && git pull https://hoainambeco:$GIT_PASS@gitlab.com/hoainambeco/WebDATN.git && pm2 restart 0"
+    - echo "All Done !!!"
+
