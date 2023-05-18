@@ -1,5 +1,5 @@
 # Web app Đặt trà sữa Veganfood dành cho admin
-http://web.veganfood.fun/   z
+https://veganfood.pimob.me/login 
 
 
 
@@ -16,7 +16,7 @@ App chạy ở localhost:3000
 
 ### Nếu bạn không biết bash script
 #### 1. Clone project  
-    git clone https://github.com/hieunv1207/WedDATN.git
+    git clone https://github.com/ThangTrannd/VeganFoodMyAdmin.git
 
     
 
